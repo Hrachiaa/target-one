@@ -1,6 +1,7 @@
 import { fastify } from '../server';
 import UserModel from '../models/UserModel';
 import TokenService from './TokenService';
+import AchievmentService from './AchievementService';
 
 export default class {
     static async auth(token: string) {
@@ -14,6 +15,8 @@ export default class {
 
         const user = await UserModel.create({ googleId: userInfo.sub });
         const tokens = await TokenService.tokenService(user);
+        AchievmentService.createDefaultAchievments(user._id.toString());
+
         return tokens;
     }
 }

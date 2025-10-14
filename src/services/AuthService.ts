@@ -5,6 +5,7 @@ import TokenService from './TokenService';
 import MailService from './MailService';
 import randomCode from '../utils/randomCode';
 import ConfirmationCodeModel from '../models/ConfirmationCodeModel';
+import AchievmentService from './AchievementService';
 
 export default class UserService {
     static async registration(email: string, password: string) {
@@ -22,6 +23,8 @@ export default class UserService {
         // creating DTO of the user, generating the tokens, hashing the refresh token,
         // saving the hash of the token to the DB, returning the user data and tokens
         const tokens = await TokenService.tokenService(user);
+        // creating default achievments
+        AchievmentService.createDefaultAchievments(user._id.toString());
         return tokens;
     }
 
