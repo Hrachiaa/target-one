@@ -1,5 +1,5 @@
 // src/models/PlanModel.ts
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model, Types, Document } from 'mongoose';
 
 export interface TaskModel {
     task: string;
@@ -11,6 +11,8 @@ export interface PlanModel {
     createdAt: Date;
     updatedAt: Date;
 }
+
+type PlanDoc = Document & PlanModel;
 
 const TaskSchema = new Schema<TaskModel>({
     task: { type: String, required: true },
@@ -30,8 +32,23 @@ const PlanSchema = new Schema<PlanModel>(
             },
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
+    }
 );
+
+PlanSchema.virtual('progress').get(function (this: PlanDoc) {
+    if (!this.plan) return 0;
+    let count = 0;
+    for (const week of this.plan) {
+        for (const task of week) {
+            if (task?.isDone) count++;
+        }
+    }
+    return count;
+});
 
 PlanSchema.index({ userId: 1 });
 

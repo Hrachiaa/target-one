@@ -38,9 +38,7 @@ export default class UserService {
         }
         // checking the password for correctness
         if (!user.password) {
-            throw ApiError.badRequest(
-                `User with email ${email} does not exist`
-            );
+            throw ApiError.badRequest(`Wrong password`);
         }
         const isTrue = await bcrypt.compare(password, user.password);
         if (!isTrue) {

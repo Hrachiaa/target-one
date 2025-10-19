@@ -13,9 +13,26 @@ export default class {
             return tokens;
         }
 
-        const user = await UserModel.create({ googleId: userInfo.sub });
-        const tokens = await TokenService.tokenService(user);
+        const condidateWithEmail = await UserModel.findOne({
+            email: userInfo.email,
+            googleId: null,
+        });
+
+        if (condidateWithEmail) {
+            condidateWithEmail.googleId = userInfo.sub;
+            await condidateWithEmail.save();
+
+            const tokens = await TokenService.tokenService(condidateWithEmail);
+            return tokens;
+        }
+
+        const user = await UserModel.create({
+            googleId: userInfo.sub,
+            email: userInfo.email,
+        });
+
         AchievmentService.createDefaultAchievments(user._id.toString());
+        const tokens = await TokenService.tokenService(user);
 
         return tokens;
     }
