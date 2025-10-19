@@ -26,4 +26,20 @@ export default class AchievementController {
         );
         return reply.send(unlock);
     }
+
+    static async setAvatar(
+        request: FastifyRequest<{
+            Body: { achievementId: string };
+            userId: string;
+        }>,
+        reply: FastifyReply
+    ) {
+        const userId = request.userId!;
+        const { achievementId } = request.body;
+        const setAvatar = await AchievementService.setAvatar(
+            userId,
+            achievementId
+        );
+        return reply.send(setAvatar);
+    }
 }
