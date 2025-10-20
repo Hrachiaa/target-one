@@ -129,4 +129,57 @@ export default class UserService {
 
         return { message: 'Password was changed' };
     }
+
+    static async confirmEmail(userId: string) {
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            throw ApiError.badRequest('User not found');
+        }
+        const email = user.email;
+        // generating and sending the random code
+        const code = randomCode();
+        await MailService.sendConfirmCode(email, code);
+        // hashing the code
+        const hashCode = await bcrypt.hash(code, 8);
+        // looking for another code
+        const codeFromDB = await ConfirmationCodeModel.findOne({
+            userId,
+        });
+        // changing the code if we already have it in the DB
+        if (codeFromDB) {
+            codeFromDB.code = hashCode;
+            codeFromDB.createdAt = new Date();
+            await codeFromDB.save();
+            return { message: 'Code is sent' };
+        }
+        // creating code in the DB
+        await ConfirmationCodeModel.create({
+            userId,
+            code: hashCode,
+        });
+        return { message: 'Code is sent' };
+    }
+
+    static async confirmCodeEmail(userId: string, code: string) {
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            throw ApiError.badRequest('User not found');
+        }
+        // looking for the code by the user ID
+        const codeFromDB = await ConfirmationCodeModel.findOne({
+            userId,
+        });
+        if (!codeFromDB) {
+            throw ApiError.badRequest(`Code does not exist`);
+        }
+        // checking if the code is true
+        const isTrue = await bcrypt.compare(code, codeFromDB.code);
+        if (!isTrue) {
+            throw ApiError.badRequest('Wrong code');
+        }
+
+        user.emailVerified = true;
+        await user.save();
+        return { message: 'Email is confirmed' };
+    }
 }

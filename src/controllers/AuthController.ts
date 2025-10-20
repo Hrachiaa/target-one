@@ -59,6 +59,25 @@ export default class AuthControllers {
         return reply.send(data);
     }
 
+    static async confirmEmail(request: FastifyRequest, reply: FastifyReply) {
+        const user = await request.jwtVerify<{ id: string }>();
+        const confirm = await AuthService.confirmEmail(user.id);
+        return reply.send(confirm);
+    }
+
+    static async confirmCodeEmail(
+        request: FastifyRequest<{
+            Body: { code: string };
+        }>,
+        reply: FastifyReply
+    ) {
+        const user = await request.jwtVerify<{ id: string }>();
+        const { code } = request.body;
+
+        const confirm = await AuthService.confirmCodeEmail(user.id, code);
+        return reply.send(confirm);
+    }
+
     static async tokenTest(request: FastifyRequest, reply: FastifyReply) {
         await request.jwtVerify();
         return reply.send({ message: 'Token is okay' });
