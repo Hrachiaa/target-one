@@ -9,8 +9,6 @@ import oauthRoutes from './routes/oauthRoutes';
 import errorHandler from './middlewares/errorHandler';
 import sessionRoutes from './routes/sessionRoutes';
 import goalRoutes from './routes/goalRoutes';
-import balanceRoutes from './routes/balanceRoutes';
-import achievementRoutes from './routes/achievementRoutes';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -44,8 +42,6 @@ fastify.register(authRoutes, { prefix: '/api/auth' });
 fastify.register(oauthRoutes, { prefix: '/api/oauth' });
 fastify.register(sessionRoutes, { prefix: '/api/session' });
 fastify.register(goalRoutes, { prefix: '/api/goal' });
-fastify.register(balanceRoutes, { prefix: '/api/balance' });
-fastify.register(achievementRoutes, { prefix: '/api/achievement' });
 fastify.setErrorHandler(errorHandler);
 
 const start = async () => {
