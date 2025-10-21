@@ -9,7 +9,7 @@ const DEFAULT_ACHIEVEMENTS: NewAch[] = [
     {
         achievment_name: 'First Login',
         icon: 'https://cdn/first-login.png',
-        price: 0,
+        price: 20,
     },
     {
         achievment_name: 'First Task',

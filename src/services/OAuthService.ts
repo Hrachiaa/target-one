@@ -20,6 +20,7 @@ export default class {
 
         if (condidateWithEmail) {
             condidateWithEmail.googleId = userInfo.sub;
+            condidateWithEmail.emailVerified = true;
             await condidateWithEmail.save();
 
             const tokens = await TokenService.tokenService(condidateWithEmail);
@@ -29,6 +30,7 @@ export default class {
         const user = await UserModel.create({
             googleId: userInfo.sub,
             email: userInfo.email,
+            emailVerified: true,
         });
 
         AchievmentService.createDefaultAchievments(user._id.toString());
