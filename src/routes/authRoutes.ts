@@ -41,6 +41,7 @@ const authRoutes = async (app: FastifyInstance) => {
     app.post('/changepassword', AuthControllers.changePassword);
     app.get('/confirmemail', AuthControllers.confirmEmail);
     app.post('/checkconfirmcode', AuthControllers.changePassword);
+    app.post('/deleteuser', AuthControllers.deleteUser);
 
     app.get('/tokentest', AuthControllers.tokenTest);
 };
