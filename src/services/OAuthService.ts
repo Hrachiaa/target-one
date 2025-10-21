@@ -1,6 +1,7 @@
 import { fastify } from '../server';
 import UserModel from '../models/UserModel';
 import TokenService from './TokenService';
+import AchievmentService from './AchievementService';
 
 export default class {
     static async auth(token: string) {
@@ -12,8 +13,29 @@ export default class {
             return tokens;
         }
 
-        const user = await UserModel.create({ googleId: userInfo.sub });
+        const condidateWithEmail = await UserModel.findOne({
+            email: userInfo.email,
+            googleId: null,
+        });
+
+        if (condidateWithEmail) {
+            condidateWithEmail.googleId = userInfo.sub;
+            condidateWithEmail.emailVerified = true;
+            await condidateWithEmail.save();
+
+            const tokens = await TokenService.tokenService(condidateWithEmail);
+            return tokens;
+        }
+
+        const user = await UserModel.create({
+            googleId: userInfo.sub,
+            email: userInfo.email,
+            emailVerified: true,
+        });
+
+        AchievmentService.createDefaultAchievments(user._id.toString());
         const tokens = await TokenService.tokenService(user);
+
         return tokens;
     }
 }
