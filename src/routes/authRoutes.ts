@@ -38,20 +38,9 @@ const authRoutes = async (app: FastifyInstance) => {
         },
         AuthControllers.reset
     );
-    app.get(
-        '/confirmemail',
-        {
-            schema: authRouteSchemas.reset,
-        },
-        AuthControllers.confirmEmail
-    );
-    app.post(
-        '/checkconfirmcode',
-        {
-            schema: authRouteSchemas.reset,
-        },
-        AuthControllers.confirmCodeEmail
-    );
+    app.post('/changepassword', AuthControllers.changePassword);
+    app.get('/confirmemail', AuthControllers.confirmEmail);
+    app.post('/checkconfirmcode', AuthControllers.changePassword);
 
     app.get('/tokentest', AuthControllers.tokenTest);
 };

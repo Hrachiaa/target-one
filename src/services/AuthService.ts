@@ -130,6 +130,39 @@ export default class UserService {
         return { message: 'Password was changed' };
     }
 
+    static async changePassword(
+        userId: string,
+        oldPassword: string,
+        newPassword: string
+    ) {
+        if (oldPassword === newPassword) {
+            throw ApiError.badRequest(
+                'New password has to be not the same to old one'
+            );
+        }
+        // find user from DB
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            throw ApiError.serverError('User not found');
+        }
+        // user signed up through google account
+        if (!user.password) {
+            throw ApiError.badRequest(
+                'User signed up through google account and does not have password'
+            );
+        }
+        // checking password
+        const isTrue = await bcrypt.compare(oldPassword, user.password);
+        if (!isTrue) {
+            throw ApiError.badRequest('Wrong password');
+        }
+        // hash new password and change it
+        const hashPassword = await bcrypt.hash(newPassword, 8);
+        user.password = hashPassword;
+        user.save();
+        return { message: 'Password was changed' };
+    }
+
     static async confirmEmail(userId: string) {
         const user = await UserModel.findById(userId);
         if (!user) {
