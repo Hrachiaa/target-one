@@ -39,16 +39,16 @@ export default class TokenService {
         }
     }
 
-    static async saveToken(userId: any, hashToken: string) {
+    static async saveToken(user: any, hashToken: string) {
         // checking the DB for the token, changing on new one if there is
-        const tokenData = await TokenModel.findOne({ userId });
+        const tokenData = await TokenModel.findOne({ user });
         if (tokenData) {
             tokenData.refreshToken = hashToken;
             return tokenData.save();
         }
         // Creating new one if there wasnt
         const token = await TokenModel.create({
-            userId,
+            user,
             refreshToken: hashToken,
         });
         return token;
@@ -62,7 +62,7 @@ export default class TokenService {
                 throw ApiError.unauthorizedError();
             }
             // trying to find the token it the DB by user id from which we got from userDto
-            const token = await TokenModel.findOne({ userId: tokenData.id });
+            const token = await TokenModel.findOne({ user: tokenData.id });
             if (!token) {
                 throw ApiError.unauthorizedError();
             }
@@ -88,7 +88,7 @@ export default class TokenService {
             throw ApiError.unauthorizedError();
         }
         // trying to find the token in the DB by user id from which we got from userDto
-        const token = await TokenModel.findOne({ userId: tokenData.id });
+        const token = await TokenModel.findOne({ user: tokenData.id });
         if (!token) {
             throw ApiError.unauthorizedError();
         }
@@ -98,7 +98,7 @@ export default class TokenService {
             throw ApiError.unauthorizedError();
         }
         // deleting the refreshToken from DB by user id
-        await TokenModel.deleteOne({ userId: tokenData.id });
+        await TokenModel.deleteOne({ user: tokenData.id });
         return { messege: 'Token was deleted' };
     }
 }

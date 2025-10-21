@@ -1,8 +1,5 @@
 import nodemailer from 'nodemailer';
-import {
-    emailTemplateConfirmCode,
-    emailTemplateResetCode,
-} from '../utils/emailTemplate';
+import emailTemplate from '../utils/emailTemplate';
 
 class MailService {
     private transporter;
@@ -24,17 +21,7 @@ class MailService {
             to,
             subject: 'Password Reset Code',
             text: '',
-            html: emailTemplateResetCode(code),
-        });
-    }
-
-    async sendConfirmCode(to: string, code: string) {
-        await this.transporter.sendMail({
-            from: process.env.SMTP_USER,
-            to,
-            subject: 'Email Confirm Code',
-            text: '',
-            html: emailTemplateConfirmCode(code),
+            html: emailTemplate(code),
         });
     }
 }

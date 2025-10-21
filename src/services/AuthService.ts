@@ -5,7 +5,6 @@ import TokenService from './TokenService';
 import MailService from './MailService';
 import randomCode from '../utils/randomCode';
 import ConfirmationCodeModel from '../models/ConfirmationCodeModel';
-import AchievmentService from './AchievementService';
 
 export default class UserService {
     static async registration(email: string, password: string) {
@@ -23,8 +22,6 @@ export default class UserService {
         // creating DTO of the user, generating the tokens, hashing the refresh token,
         // saving the hash of the token to the DB, returning the user data and tokens
         const tokens = await TokenService.tokenService(user);
-        // creating default achievments
-        AchievmentService.createDefaultAchievments(user._id.toString());
         return tokens;
     }
 
@@ -38,7 +35,9 @@ export default class UserService {
         }
         // checking the password for correctness
         if (!user.password) {
-            throw ApiError.badRequest(`Wrong password`);
+            throw ApiError.badRequest(
+                `User with email ${email} does not exist`
+            );
         }
         const isTrue = await bcrypt.compare(password, user.password);
         if (!isTrue) {
@@ -128,91 +127,5 @@ export default class UserService {
         await codeFromDB.deleteOne();
 
         return { message: 'Password was changed' };
-    }
-
-    static async changePassword(
-        userId: string,
-        oldPassword: string,
-        newPassword: string
-    ) {
-        if (oldPassword === newPassword) {
-            throw ApiError.badRequest(
-                'New password has to be not the same to old one'
-            );
-        }
-        // find user from DB
-        const user = await UserModel.findById(userId);
-        if (!user) {
-            throw ApiError.serverError('User not found');
-        }
-        // user signed up through google account
-        if (!user.password) {
-            throw ApiError.badRequest(
-                'User signed up through google account and does not have password'
-            );
-        }
-        // checking password
-        const isTrue = await bcrypt.compare(oldPassword, user.password);
-        if (!isTrue) {
-            throw ApiError.badRequest('Wrong password');
-        }
-        // hash new password and change it
-        const hashPassword = await bcrypt.hash(newPassword, 8);
-        user.password = hashPassword;
-        user.save();
-        return { message: 'Password was changed' };
-    }
-
-    static async confirmEmail(userId: string) {
-        const user = await UserModel.findById(userId);
-        if (!user) {
-            throw ApiError.badRequest('User not found');
-        }
-        const email = user.email;
-        // generating and sending the random code
-        const code = randomCode();
-        await MailService.sendConfirmCode(email, code);
-        // hashing the code
-        const hashCode = await bcrypt.hash(code, 8);
-        // looking for another code
-        const codeFromDB = await ConfirmationCodeModel.findOne({
-            userId,
-        });
-        // changing the code if we already have it in the DB
-        if (codeFromDB) {
-            codeFromDB.code = hashCode;
-            codeFromDB.createdAt = new Date();
-            await codeFromDB.save();
-            return { message: 'Code is sent' };
-        }
-        // creating code in the DB
-        await ConfirmationCodeModel.create({
-            userId,
-            code: hashCode,
-        });
-        return { message: 'Code is sent' };
-    }
-
-    static async confirmCodeEmail(userId: string, code: string) {
-        const user = await UserModel.findById(userId);
-        if (!user) {
-            throw ApiError.badRequest('User not found');
-        }
-        // looking for the code by the user ID
-        const codeFromDB = await ConfirmationCodeModel.findOne({
-            userId,
-        });
-        if (!codeFromDB) {
-            throw ApiError.badRequest(`Code does not exist`);
-        }
-        // checking if the code is true
-        const isTrue = await bcrypt.compare(code, codeFromDB.code);
-        if (!isTrue) {
-            throw ApiError.badRequest('Wrong code');
-        }
-
-        user.emailVerified = true;
-        await user.save();
-        return { message: 'Email is confirmed' };
     }
 }
