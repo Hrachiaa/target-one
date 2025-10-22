@@ -15,12 +15,22 @@ import achievementRoutes from './routes/achievementRoutes';
 const PORT = Number(process.env.PORT) || 5000;
 
 const fastify = Fastify({
-    // logger: true,
-    logger: { level: 'trace' },
+    logger: true,
+    // logger: { level: 'trace' },
 });
 
 fastify.register(jwt, {
-    secret: process.env.JWT_SECRET_KEY as string,
+    secret: process.env.JWT_ACCESS_SECRET,
+    namespace: 'accessJwt',
+    jwtVerify: 'accessJwtVerify',
+    jwtSign: 'accessJwtSign',
+});
+
+fastify.register(jwt, {
+    secret: process.env.JWT_REFRESH_SECRET,
+    namespace: 'refreshJwt',
+    jwtVerify: 'refreshJwtVerify',
+    jwtSign: 'refreshJwtSign',
 });
 
 fastify.register(fastifyOauth2, {
