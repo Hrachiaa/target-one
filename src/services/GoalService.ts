@@ -111,6 +111,6 @@ export default class GoalService {
     }
 
     static async removeGoals(userId: string) {
-        await PlanModel.findOneAndDelete({ userId });
+        await PlanModel.deleteMany({ userId });
     }
 }

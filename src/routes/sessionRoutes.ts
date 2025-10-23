@@ -3,13 +3,7 @@ import SessionController from '../controllers/SessionController';
 import authRouteSchemas from '../schemas/authRouteSchemas';
 
 const sessionRoutes = async (app: FastifyInstance) => {
-    app.post(
-        '/logout',
-        {
-            schema: authRouteSchemas.getRefreshSchema,
-        },
-        SessionController.logout
-    );
+    app.post('/logout', SessionController.logout);
     app.post(
         '/refresh',
         {

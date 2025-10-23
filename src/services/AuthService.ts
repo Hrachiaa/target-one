@@ -9,7 +9,11 @@ import AchievmentService from './AchievementService';
 import GoalService from './GoalService';
 
 export default class UserService {
-    static async registration(email: string, password: string) {
+    static async registration(
+        email: string,
+        password: string,
+        deviceToken: string | undefined
+    ) {
         // checking the user for existence
         const condidate = await UserModel.findOne({ email });
         if (condidate) {
@@ -19,8 +23,27 @@ export default class UserService {
         }
         // hashing the password
         const hashPassword = await bcrypt.hash(password, 8);
+
+        if (!deviceToken) {
+            // creating the user data to the DB
+            const user = await UserModel.create({
+                email,
+                password: hashPassword,
+            });
+            // creating DTO of the user, generating the tokens, hashing the refresh token,
+            // saving the hash of the token to the DB, returning the user data and tokens
+            const tokens = await TokenService.tokenService(user);
+            // creating default achievments
+            AchievmentService.createDefaultAchievments(user._id.toString());
+            return tokens;
+        }
+
         // creating the user data to the DB
-        const user = await UserModel.create({ email, password: hashPassword });
+        const user = await UserModel.create({
+            email,
+            password: hashPassword,
+            deviceToken,
+        });
         // creating DTO of the user, generating the tokens, hashing the refresh token,
         // saving the hash of the token to the DB, returning the user data and tokens
         const tokens = await TokenService.tokenService(user);
@@ -29,7 +52,11 @@ export default class UserService {
         return tokens;
     }
 
-    static async login(email: string, password: string) {
+    static async login(
+        email: string,
+        password: string,
+        deviceToken: string | undefined
+    ) {
         // checking the user for existence
         const user = await UserModel.findOne({ email });
         if (!user) {
@@ -44,6 +71,14 @@ export default class UserService {
         const isTrue = await bcrypt.compare(password, user.password);
         if (!isTrue) {
             throw ApiError.badRequest(`Wrong password`);
+        }
+        if (deviceToken) {
+            user.deviceToken = deviceToken;
+            await user.save();
+            // creating DTO of the user, generating the tokens, hashing the refresh token,
+            // saving the hash of the token to the DB, returning the user data and tokens
+            const tokens = await TokenService.tokenService(user);
+            return tokens;
         }
         // creating DTO of the user, generating the tokens, hashing the refresh token,
         // saving the hash of the token to the DB, returning the user data and tokens

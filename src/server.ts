@@ -11,6 +11,7 @@ import sessionRoutes from './routes/sessionRoutes';
 import goalRoutes from './routes/goalRoutes';
 import balanceRoutes from './routes/balanceRoutes';
 import achievementRoutes from './routes/achievementRoutes';
+import notificationRoutes from './routes/notificationRoutes';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -52,6 +53,7 @@ fastify.register(fastifyOauth2, {
 
 fastify.register(authRoutes, { prefix: '/api/auth' });
 fastify.register(oauthRoutes, { prefix: '/api/oauth' });
+fastify.register(notificationRoutes, { prefix: '/api/me' });
 fastify.register(sessionRoutes, { prefix: '/api/session' });
 fastify.register(goalRoutes, { prefix: '/api/goal' });
 fastify.register(balanceRoutes, { prefix: '/api/balance' });

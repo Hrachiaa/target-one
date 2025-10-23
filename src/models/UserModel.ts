@@ -13,6 +13,7 @@ const UserSchema = new Schema(
         emailVerified: { type: Boolean, default: false },
         googleId: { type: String, unique: true, sparse: true },
         password: { type: String },
+        deviceToken: { type: String },
         avatar: { type: String, default: 'https://cdn/first-login.png' },
     },
     { timestamps: true }

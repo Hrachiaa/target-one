@@ -4,6 +4,7 @@ import AuthService from '../services/AuthService';
 interface Auth {
     email: string;
     password: string;
+    deviceToken?: string;
 }
 
 export default class AuthControllers {
@@ -11,8 +12,12 @@ export default class AuthControllers {
         request: FastifyRequest<{ Body: Auth }>,
         reply: FastifyReply
     ) {
-        const { email, password } = request.body;
-        const userData = await AuthService.registration(email, password);
+        const { email, password, deviceToken } = request.body;
+        const userData = await AuthService.registration(
+            email,
+            password,
+            deviceToken
+        );
         return reply.send(userData);
     }
 
@@ -21,8 +26,8 @@ export default class AuthControllers {
         reply: FastifyReply
     ) {
         const email = request.body.email.trim().toLowerCase();
-        const password = request.body.password;
-        const userData = await AuthService.login(email, password);
+        const { password, deviceToken } = request.body;
+        const userData = await AuthService.login(email, password, deviceToken);
         return reply.send(userData);
     }
 

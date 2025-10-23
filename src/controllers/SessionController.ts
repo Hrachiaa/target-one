@@ -2,12 +2,9 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import SessionService from '../services/SessionService';
 
 export default class {
-    static async logout(
-        request: FastifyRequest<{ Body: { refreshToken: string } }>,
-        reply: FastifyReply
-    ) {
-        const { refreshToken } = request.body;
-        const token = await SessionService.logout(refreshToken);
+    static async logout(request: FastifyRequest, reply: FastifyReply) {
+        const user = await request.accessJwtVerify<{ id: string }>();
+        const token = await SessionService.logout(user.id);
         return reply.send(token);
     }
 

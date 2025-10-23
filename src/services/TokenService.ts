@@ -111,5 +111,6 @@ export default class TokenService {
 
     static async removeTokenById(userId: string) {
         await TokenModel.findOneAndDelete({ userId });
+        return { messege: 'Token was deleted' };
     }
 }

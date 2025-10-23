@@ -1,13 +1,12 @@
 import ApiError from '../core/errors/ApiError';
 import UserModel from '../models/UserModel';
+import NotificationService from './NotificationService';
 import TokenService from './TokenService';
 
 export default class SessionService {
-    static async logout(refreshToken: string | undefined) {
-        if (!refreshToken) {
-            throw ApiError.unauthorizedError();
-        }
-        const token = await TokenService.removeToken(refreshToken);
+    static async logout(userId: string) {
+        const token = await TokenService.removeTokenById(userId);
+        await NotificationService.deleteDeviceToken(userId);
         return token;
     }
 

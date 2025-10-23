@@ -10,6 +10,9 @@ export default {
                     minLength: 8, // минимум 8 символов
                     maxLength: 64,
                 },
+                deviceToken: {
+                    type: 'string',
+                },
             },
             additionalProperties: false,
         },
