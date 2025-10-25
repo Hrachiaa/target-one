@@ -8,7 +8,6 @@ const goalRoutes = async (app: FastifyInstance) => {
     app.post('/complete', GoalController.completePlanTask);
     app.post('/uncomplete', GoalController.uncompletePlanTask);
     app.get('/plans', GoalController.getUserPlans);
-    app.post('/delete', GoalController.deletePlan);
 };
 
 export default goalRoutes;

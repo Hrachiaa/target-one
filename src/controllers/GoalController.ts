@@ -43,15 +43,4 @@ export default class GoalController {
         );
         return reply.send(updatedTask);
     }
-
-    static async deletePlan(
-        request: FastifyRequest<{ Body: { planId: string }; userId: string }>,
-        reply: FastifyReply
-    ) {
-        const userId = request.userId!;
-        const { planId } = request.body;
-        const deleteOne = await GoalService.removeGoal(userId, planId);
-
-        return reply.send(deleteOne);
-    }
 }

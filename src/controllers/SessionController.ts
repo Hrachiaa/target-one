@@ -21,7 +21,7 @@ export default class {
     }
 
     static async authentication(request: FastifyRequest, reply: FastifyReply) {
-        const payload = await request.accessJwtVerify<{ id: string }>();
+        const payload = await request.jwtVerify<{ id: string }>();
         return (request.userId = payload.id);
     }
 }

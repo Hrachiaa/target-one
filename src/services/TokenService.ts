@@ -24,20 +24,15 @@ export default class TokenService {
     static generateTokens(payload: UserDto) {
         // payload is DTO of user
         // generation of tokens
-        console.log(fastify.jwt);
-        const accessToken = fastify.jwt.accessJwt.sign(payload, {
-            expiresIn: '15m',
-        });
-        const refreshToken = fastify.jwt.refreshJwt.sign(payload, {
-            expiresIn: '14d',
-        });
+        const accessToken = fastify.jwt.sign(payload, { expiresIn: '15m' });
+        const refreshToken = fastify.jwt.sign(payload, { expiresIn: '14d' });
         return { accessToken, refreshToken };
     }
 
     static validateRefreshToken(refreshToken: string) {
         try {
             // checking if token is valid
-            const userData = fastify.jwt.refreshJwt.verify(refreshToken);
+            const userData = fastify.jwt.verify(refreshToken);
             return userData;
         } catch (error) {
             return null;
@@ -62,8 +57,7 @@ export default class TokenService {
     static async findToken(refreshToken: string) {
         try {
             // decoding the jwt token to get userDto to have id of user
-            const tokenData: UserDto | null =
-                fastify.jwt.refreshJwt.decode(refreshToken);
+            const tokenData: UserDto | null = fastify.jwt.decode(refreshToken);
             if (!tokenData) {
                 throw ApiError.unauthorizedError();
             }
@@ -89,8 +83,7 @@ export default class TokenService {
 
     static async removeToken(refreshToken: string) {
         // decoding the jwt token to get userDto to have id of user
-        const tokenData: UserDto | null =
-            fastify.jwt.refreshJwt.decode(refreshToken);
+        const tokenData: UserDto | null = fastify.jwt.decode(refreshToken);
         if (!tokenData) {
             throw ApiError.unauthorizedError();
         }
@@ -107,9 +100,5 @@ export default class TokenService {
         // deleting the refreshToken from DB by user id
         await TokenModel.deleteOne({ userId: tokenData.id });
         return { messege: 'Token was deleted' };
-    }
-
-    static async removeTokenById(userId: string) {
-        await TokenModel.findOneAndDelete({ userId });
     }
 }

@@ -65,7 +65,7 @@ export default class AuthControllers {
         }>,
         reply: FastifyReply
     ) {
-        const user = await request.accessJwtVerify<{ id: string }>();
+        const user = await request.jwtVerify<{ id: string }>();
         const { oldPassword, newPassword } = request.body;
         const changePassword = await AuthService.changePassword(
             user.id,
@@ -76,7 +76,7 @@ export default class AuthControllers {
     }
 
     static async confirmEmail(request: FastifyRequest, reply: FastifyReply) {
-        const user = await request.accessJwtVerify<{ id: string }>();
+        const user = await request.jwtVerify<{ id: string }>();
         const confirm = await AuthService.confirmEmail(user.id);
         return reply.send(confirm);
     }
@@ -87,21 +87,15 @@ export default class AuthControllers {
         }>,
         reply: FastifyReply
     ) {
-        const user = await request.accessJwtVerify<{ id: string }>();
+        const user = await request.jwtVerify<{ id: string }>();
         const { code } = request.body;
 
         const confirm = await AuthService.confirmCodeEmail(user.id, code);
         return reply.send(confirm);
     }
 
-    static async deleteUser(request: FastifyRequest, reply: FastifyReply) {
-        const user = await request.accessJwtVerify<{ id: string }>();
-        const deleted = await AuthService.deleteUser(user.id);
-        return reply.send(deleted);
-    }
-
     static async tokenTest(request: FastifyRequest, reply: FastifyReply) {
-        await request.accessJwtVerify();
+        await request.jwtVerify();
         return reply.send({ message: 'Token is okay' });
     }
 }
