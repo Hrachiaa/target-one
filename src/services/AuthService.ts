@@ -6,7 +6,6 @@ import MailService from './MailService';
 import randomCode from '../utils/randomCode';
 import ConfirmationCodeModel from '../models/ConfirmationCodeModel';
 import AchievmentService from './AchievementService';
-import GoalService from './GoalService';
 
 export default class UserService {
     static async registration(email: string, password: string) {
@@ -215,18 +214,5 @@ export default class UserService {
         user.emailVerified = true;
         await user.save();
         return { message: 'Email is confirmed' };
-    }
-
-    static async deleteUser(userId: string) {
-        const user = await UserModel.findById(userId);
-        if (!user) {
-            throw ApiError.badRequest('User does not exist');
-        }
-
-        await user.deleteOne();
-        await TokenService.removeTokenById(userId);
-        await AchievmentService.removeAchievements(userId);
-        await GoalService.removeGoals(userId);
-        return { message: 'User was deleted' };
     }
 }
