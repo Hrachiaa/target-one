@@ -101,4 +101,8 @@ export default class AchievementService {
 
         return user;
     }
+
+    static async removeAchievements(userId: string) {
+        await AchievementModel.findOneAndDelete({ userId });
+    }
 }
