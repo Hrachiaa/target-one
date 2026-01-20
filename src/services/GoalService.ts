@@ -96,4 +96,21 @@ export default class GoalService {
         await BalanceService.decreaseBalance(userId, 20);
         return updated;
     }
+
+    static async removeGoal(userId: string, planId: string) {
+        const plan = await PlanModel.findOne({
+            userId,
+            _id: planId,
+        });
+        if (!plan) {
+            throw ApiError.badRequest('Plan does not exist');
+        }
+
+        await PlanModel.findByIdAndDelete(planId);
+        return { message: 'Plan was deleted' };
+    }
+
+    static async removeGoals(userId: string) {
+        await PlanModel.findOneAndDelete({ userId });
+    }
 }
