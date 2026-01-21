@@ -5,8 +5,8 @@ import client from '../config/openai';
 import ApiError from '../core/errors/ApiError';
 import PlanModel from '../models/PlanModel';
 import { questionsSchema, planSchema } from '../schemas/goalSchemas';
-import { Types } from 'mongoose';
 import BalanceService from './BalanceService';
+import PlanRepository from '../repositories/mongoDB/PlanRepository';
 
 export default class GoalService {
     static model = 'gpt-4o-mini-2024-07-18';
@@ -37,33 +37,16 @@ export default class GoalService {
             store: this.store,
         });
         const plan = createPlan.output_parsed!;
-        return await PlanModel.create({ userId, plan: plan.plan });
+        return await PlanRepository.createPlan(userId, plan.plan);
     }
 
     static async getUserPlans(userId: string) {
-        const plans = await PlanModel.find({ userId });
+        const plans = await PlanRepository.getAllPlans(userId) ;
         return plans || [];
     }
 
     static async completePlanTask(userId: string, taskId: string) {
-        const updated = await PlanModel.findOneAndUpdate(
-            {
-                userId,
-                plan: {
-                    $elemMatch: {
-                        $elemMatch: {
-                            _id: new Types.ObjectId(taskId),
-                            isDone: false,
-                        },
-                    },
-                },
-            },
-            { $set: { 'plan.$[].$[inner].isDone': true } },
-            {
-                arrayFilters: [{ 'inner._id': new Types.ObjectId(taskId) }],
-                new: true,
-            }
-        );
+        const updated = await PlanRepository.completeTask(userId, taskId)
         if (!updated) {
             throw ApiError.badRequest('Task is already done');
         }
@@ -72,24 +55,7 @@ export default class GoalService {
     }
 
     static async uncompletePlanTask(userId: string, taskId: string) {
-        const updated = await PlanModel.findOneAndUpdate(
-            {
-                userId,
-                plan: {
-                    $elemMatch: {
-                        $elemMatch: {
-                            _id: new Types.ObjectId(taskId),
-                            isDone: true,
-                        },
-                    },
-                },
-            },
-            { $set: { 'plan.$[].$[inner].isDone': false } },
-            {
-                arrayFilters: [{ 'inner._id': new Types.ObjectId(taskId) }],
-                new: true,
-            }
-        );
+        const updated = await PlanRepository.uncompleteTask(userId, taskId)
         if (!updated) {
             throw ApiError.badRequest('Task is already mark as not done');
         }
@@ -98,19 +64,11 @@ export default class GoalService {
     }
 
     static async removeGoal(userId: string, planId: string) {
-        const plan = await PlanModel.findOne({
-            userId,
-            _id: planId,
-        });
-        if (!plan) {
-            throw ApiError.badRequest('Plan does not exist');
-        }
-
-        await PlanModel.findByIdAndDelete(planId);
+        await PlanRepository.deletePlan(planId)
         return { message: 'Plan was deleted' };
     }
 
     static async removeGoals(userId: string) {
-        await PlanModel.findOneAndDelete({ userId });
+        await PlanRepository.deletAllePlans(userId)
     }
 }

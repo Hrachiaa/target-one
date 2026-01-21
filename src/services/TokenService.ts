@@ -1,6 +1,6 @@
 import ApiError from '../core/errors/ApiError';
+import TokenRepository from '../repositories/mongoDB/TokenRepository';
 import UserDto from '../dtos/UserDto';
-import TokenModel from '../models/TokenModel';
 import { fastify } from '../server';
 import bcrypt from 'bcryptjs';
 
@@ -24,7 +24,6 @@ export default class TokenService {
     static generateTokens(payload: UserDto) {
         // payload is DTO of user
         // generation of tokens
-        console.log(fastify.jwt);
         const accessToken = fastify.jwt.accessJwt.sign(payload, {
             expiresIn: '15m',
         });
@@ -46,16 +45,12 @@ export default class TokenService {
 
     static async saveToken(userId: any, hashToken: string) {
         // checking the DB for the token, changing on new one if there is
-        const tokenData = await TokenModel.findOne({ userId });
+        const tokenData = await TokenRepository.findTokenByUser(userId);
         if (tokenData) {
-            tokenData.refreshToken = hashToken;
-            return tokenData.save();
+            return await TokenRepository.saveToken(String(tokenData._id), hashToken)
         }
         // Creating new one if there wasnt
-        const token = await TokenModel.create({
-            userId,
-            refreshToken: hashToken,
-        });
+        const token = await TokenRepository.createToken(String(userId), hashToken)
         return token;
     }
 
@@ -68,7 +63,7 @@ export default class TokenService {
                 throw ApiError.unauthorizedError();
             }
             // trying to find the token it the DB by user id from which we got from userDto
-            const token = await TokenModel.findOne({ userId: tokenData.id });
+            const token = await TokenRepository.findTokenByUser(tokenData.id);
             if (!token) {
                 throw ApiError.unauthorizedError();
             }
@@ -95,7 +90,7 @@ export default class TokenService {
             throw ApiError.unauthorizedError();
         }
         // trying to find the token in the DB by user id from which we got from userDto
-        const token = await TokenModel.findOne({ userId: tokenData.id });
+        const token = await TokenRepository.findTokenByUser(tokenData.id);
         if (!token) {
             throw ApiError.unauthorizedError();
         }
@@ -105,11 +100,11 @@ export default class TokenService {
             throw ApiError.unauthorizedError();
         }
         // deleting the refreshToken from DB by user id
-        await TokenModel.deleteOne({ userId: tokenData.id });
+        await TokenRepository.deleteToken(tokenData.id);
         return { messege: 'Token was deleted' };
     }
 
     static async removeTokenById(userId: string) {
-        await TokenModel.findOneAndDelete({ userId });
+        await TokenRepository.deleteToken(userId);
     }
 }

@@ -1,5 +1,5 @@
 import ApiError from '../core/errors/ApiError';
-import UserModel from '../models/UserModel';
+import UserRepository from '../repositories/mongoDB/UserRepository';
 import TokenService from './TokenService';
 
 export default class SessionService {
@@ -24,7 +24,7 @@ export default class SessionService {
         }
         // creating DTO of the user, generating the tokens, hashing the refresh token,
         // saving the hash of the token to the DB, returning the user data and tokens
-        const user = await UserModel.findById(userData.id);
+        const user = await UserRepository.findById(userData.id);
         const tokens = await TokenService.tokenService(user);
         return tokens;
     }

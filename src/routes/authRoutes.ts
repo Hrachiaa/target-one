@@ -5,42 +5,42 @@ import authRouteSchemas from '../schemas/authRouteSchemas';
 const authRoutes = async (app: FastifyInstance) => {
     app.post(
         '/registration',
-        {
-            schema: authRouteSchemas.authSchema,
-        },
+        // {
+        //     schema: authRouteSchemas.authSchema,
+        // },
         AuthControllers.registration
     );
     app.post(
         '/login',
-        {
-            schema: authRouteSchemas.authSchema,
-        },
+        // {
+        //     schema: authRouteSchemas.authSchema,
+        // },
         AuthControllers.login
     );
     app.post(
         '/forgot',
-        {
-            schema: authRouteSchemas.forgotPassSchema,
-        },
+        // {
+        //     schema: authRouteSchemas.forgotPassSchema,
+        // },
         AuthControllers.forgot
     );
     app.post(
         '/checkresetcode',
-        {
-            schema: authRouteSchemas.checkCode,
-        },
+        // {
+        //     schema: authRouteSchemas.checkCode,
+        // },
         AuthControllers.checkCode
     );
     app.post(
         '/reset',
-        {
-            schema: authRouteSchemas.reset,
-        },
+        // {
+        //     schema: authRouteSchemas.reset,
+        // },
         AuthControllers.reset
     );
     app.post('/changepassword', AuthControllers.changePassword);
     app.get('/confirmemail', AuthControllers.confirmEmail);
-    app.post('/checkconfirmcode', AuthControllers.changePassword);
+    app.post('/checkconfirmcode', AuthControllers.confirmCodeEmail);
     app.post('/deleteuser', AuthControllers.deleteUser);
 
     app.get('/tokentest', AuthControllers.tokenTest);

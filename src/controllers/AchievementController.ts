@@ -7,7 +7,7 @@ export default class AchievementController {
         reply: FastifyReply
     ) {
         const userId = request.userId!;
-        const achievements = await AchievementService.getAchievments(userId);
+        const achievements = await AchievementService.getAchievements(userId);
         return reply.send(achievements);
     }
 

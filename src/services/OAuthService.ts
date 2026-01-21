@@ -1,39 +1,29 @@
 import { fastify } from '../server';
-import UserModel from '../models/UserModel';
 import TokenService from './TokenService';
-import AchievmentService from './AchievementService';
+import AchievementService from './AchievementService';
+import UserRepository from '../repositories/mongoDB/UserRepository';
 
 export default class {
     static async auth(token: string) {
         const userInfo = await fastify.googleOAuth2.userinfo(token);
 
-        const condidate = await UserModel.findOne({ googleId: userInfo.sub });
+        const condidate = await UserRepository.findUserByGoogleId(userInfo.sub);
         if (condidate) {
             const tokens = await TokenService.tokenService(condidate);
             return tokens;
         }
 
-        const condidateWithEmail = await UserModel.findOne({
-            email: userInfo.email,
-            googleId: null,
-        });
+        const condidateWithEmail = await UserRepository.findUserWithEmail(userInfo.email);
 
         if (condidateWithEmail) {
-            condidateWithEmail.googleId = userInfo.sub;
-            condidateWithEmail.emailVerified = true;
-            await condidateWithEmail.save();
+            await UserRepository.verifyUserWithEmail(String(condidateWithEmail._id), userInfo.sub)
 
-            const tokens = await TokenService.tokenService(condidateWithEmail);
-            return tokens;
+            return await TokenService.tokenService(condidateWithEmail);
         }
 
-        const user = await UserModel.create({
-            googleId: userInfo.sub,
-            email: userInfo.email,
-            emailVerified: true,
-        });
+        const user = await UserRepository.createUserWithGoogleId(userInfo.sub, userInfo.email)
 
-        AchievmentService.createDefaultAchievments(user._id.toString());
+        AchievementService.createDefaultAchievements(user._id.toString());
         const tokens = await TokenService.tokenService(user);
 
         return tokens;
