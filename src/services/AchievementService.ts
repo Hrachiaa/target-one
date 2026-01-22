@@ -4,11 +4,12 @@ import UserRepository from '../repositories/mongoDB/UserRepository';
 import AchievementRepository from '../repositories/mongoDB/AchievementRepository';
 
 export default class AchievementService {
-    static async createDefaultAchievements(userId: string) {
+    static async createDefaultAchievements(userId: string): Promise<undefined> {
         const doc = await AchievementRepository.findByUserId(userId);
 
         if (!doc) {
-            return await AchievementRepository.createAchievements(userId)
+            await AchievementRepository.createAchievements(userId)
+            return
         }
         return;
         // TODO: later — check for missing achievements and add them if document exists

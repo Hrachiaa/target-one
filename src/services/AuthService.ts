@@ -7,9 +7,10 @@ import AchievementService from './AchievementService';
 import GoalService from './GoalService';
 import UserRepository from '../repositories/mongoDB/UserRepository';
 import ConfirmationCodeRepository from '../repositories/mongoDB/ConfirmationCodeRepository';
+import { AuthData } from '../types/types';
 
 export default class UserService {
-    static async registration(email: string, password: string) {
+    static async registration(email: string, password: string): Promise<AuthData> {
         // checking the user for existence
         const condidate = await UserRepository.findUserByEmail(email);
         if (condidate) {
@@ -23,15 +24,16 @@ export default class UserService {
         const user = await UserRepository.createUserWithEmail(email, hashPassword);
         // creating DTO of the user, generating the tokens, hashing the refresh token,
         // saving the hash of the token to the DB, returning the user data and tokens
-        const tokens = await TokenService.tokenService(user);
+        const authData = await TokenService.tokenService(user);
         // creating default ets
         AchievementService.createDefaultAchievements(String(user._id));
-        return tokens;
+        return authData;
     }
 
     static async login(email: string, password: string) {
         // checking the user for existence
         const user = await UserRepository.findUserByEmail(email);
+        console.log(user)
         if (!user) {
             throw ApiError.badRequest(
                 `User with email ${email} does not exist`
@@ -112,10 +114,9 @@ export default class UserService {
         // hashing the passwrod
         const hashPassword = await bcrypt.hash(password, 8);
         // updating password
-        user.password = hashPassword;
-        await user.save();
+        await UserRepository.changePassword(String(user._id), hashPassword)
         // deleting the code from the DB
-        await codeFromDB.deleteOne();
+        await ConfirmationCodeRepository.deleteCode(String(codeFromDB._id))
 
         return { message: 'Password was changed' };
     }
@@ -148,8 +149,7 @@ export default class UserService {
         }
         // hash new password and change it
         const hashPassword = await bcrypt.hash(newPassword, 8);
-        user.password = hashPassword;
-        user.save();
+        await UserRepository.changePassword(String(user._id), hashPassword)
         return { message: 'Password was changed' };
     }
 
@@ -192,8 +192,7 @@ export default class UserService {
             throw ApiError.badRequest('Wrong code');
         }
 
-        user.emailVerified = true;
-        await user.save();
+        await UserRepository.verifyEmail(String(user._id))
         return { message: 'Email is confirmed' };
     }
 
@@ -203,7 +202,7 @@ export default class UserService {
             throw ApiError.badRequest('User does not exist');
         }
 
-        await user.deleteOne();
+        await UserRepository.deleteUser(String(user._id))
         await TokenService.removeTokenById(userId);
         await AchievementService.removeAchievements(userId);
         await GoalService.removeGoals(userId);
