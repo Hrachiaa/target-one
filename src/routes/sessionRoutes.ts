@@ -5,16 +5,16 @@ import authRouteSchemas from '../schemas/authRouteSchemas';
 const sessionRoutes = async (app: FastifyInstance) => {
     app.post(
         '/logout',
-        {
-            schema: authRouteSchemas.getRefreshSchema,
-        },
+        // {
+        //     schema: authRouteSchemas.getRefreshSchema,
+        // },
         SessionController.logout
     );
     app.post(
         '/refresh',
-        {
-            schema: authRouteSchemas.getRefreshSchema,
-        },
+        // {
+        //     schema: authRouteSchemas.getRefreshSchema,
+        // },
         SessionController.refresh
     );
 };

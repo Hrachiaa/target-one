@@ -15,8 +15,8 @@ import achievementRoutes from './routes/achievementRoutes';
 const PORT = Number(process.env.PORT) || 5000;
 
 const fastify = Fastify({
-    logger: true,
-    // logger: { level: 'trace' },
+    // logger: true,
+    logger: { level: 'trace' },
 });
 
 fastify.register(jwt, {

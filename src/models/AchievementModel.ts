@@ -15,7 +15,7 @@ const AchievementSchema = new Schema({
         required: true,
     },
     balance: { type: Number, default: 0 },
-    achievments: { type: [AchievmentSchema], required: true },
+    achievements: { type: [AchievmentSchema], required: true },
 });
 
 export default model('Achievement', AchievementSchema);
