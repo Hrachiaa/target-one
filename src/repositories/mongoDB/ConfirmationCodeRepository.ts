@@ -12,4 +12,8 @@ export default class ConfirmationCodeRepository {
     static async updateConfirmationCode(codeId: string, code: string){
         return await ConfirmationCodeModel.findByIdAndUpdate(codeId, {code, createdAt: new Date()})
     }
+
+    static async deleteCode(codeId: string){
+        return await ConfirmationCodeModel.findByIdAndDelete(codeId)
+    }
 }

@@ -24,10 +24,10 @@ export default class TokenService {
     static generateTokens(payload: UserDto) {
         // payload is DTO of user
         // generation of tokens
-        const accessToken = fastify.jwt.accessJwt.sign(payload, {
+        const accessToken: string = fastify.jwt.accessJwt.sign(payload, {
             expiresIn: '15m',
         });
-        const refreshToken = fastify.jwt.refreshJwt.sign(payload, {
+        const refreshToken: string = fastify.jwt.refreshJwt.sign(payload, {
             expiresIn: '14d',
         });
         return { accessToken, refreshToken };

@@ -1,17 +1,19 @@
+import { Types } from "mongoose";
+
 export default class UserDto {
-    id: any;
-    email: string | null;
+    id: string;
+    email: string;
     googleId: string | null;
     constructor({
         _id,
-        email = null,
+        email,
         googleId = null,
     }: {
-        _id: any;
-        email: string | null;
+        _id: Types.ObjectId;
+        email: string;
         googleId: string | null;
     }) {
-        this.id = _id;
+        this.id = String(_id);
         this.email = email;
         this.googleId = googleId;
     }
