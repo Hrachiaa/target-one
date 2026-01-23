@@ -1,7 +1,9 @@
 import BalanceService from './BalanceService';
 import ApiError from '../core/errors/ApiError';
-import UserRepository from '../repositories/mongoDB/UserRepository';
+import {MongoUserRepository} from '../infrastructure/db/mongoDB/user/MongoUserRepository';
 import AchievementRepository from '../repositories/mongoDB/AchievementRepository';
+
+const mongoUserRepository = new MongoUserRepository()
 
 export default class AchievementService {
     static async createDefaultAchievements(userId: string): Promise<undefined> {
@@ -46,7 +48,7 @@ export default class AchievementService {
     }
 
     static async setAvatar(userId: string, achievementId: string) {
-        const user = await UserRepository.findById(userId);
+        const user = await mongoUserRepository.findById(userId);
         if (!user) {
             throw ApiError.serverError('User not found');
         }
@@ -58,7 +60,7 @@ export default class AchievementService {
 
         const achievementLink = achievement.achievements[0].icon;
 
-        return await UserRepository.setAvatar(userId, achievementLink)
+        return await mongoUserRepository.setAvatar(userId, achievementLink)
     }
 
     static async removeAchievements(userId: string) {

@@ -1,5 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import SessionService from '../services/SessionService';
+import { MongoUserRepository } from '../infrastructure/db/mongoDB/user/MongoUserRepository';
+
+const sessionService = new SessionService(new MongoUserRepository())
 
 export default class {
     static async logout(
@@ -7,7 +10,7 @@ export default class {
         reply: FastifyReply
     ) {
         const { refreshToken } = request.body;
-        const token = await SessionService.logout(refreshToken);
+        const token = await sessionService.logout(refreshToken);
         return reply.send(token);
     }
 
@@ -16,7 +19,7 @@ export default class {
         reply: FastifyReply
     ) {
         const { refreshToken } = request.body;
-        const tokens = await SessionService.refresh(refreshToken);
+        const tokens = await sessionService.refresh(refreshToken);
         return reply.send(tokens);
     }
 

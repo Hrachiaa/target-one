@@ -1,18 +1,20 @@
 import bcrypt from 'bcryptjs';
-import ApiError from '../core/errors/ApiError';
-import TokenService from './TokenService';
-import MailService from './MailService';
-import randomCode from '../utils/randomCode';
-import AchievementService from './AchievementService';
-import GoalService from './GoalService';
-import UserRepository from '../repositories/mongoDB/UserRepository';
-import ConfirmationCodeRepository from '../repositories/mongoDB/ConfirmationCodeRepository';
-import { AuthData } from '../types/types';
+import ApiError from '../../core/errors/ApiError';
+import TokenService from '../../services/TokenService';
+import MailService from '../../services/MailService';
+import randomCode from '../../utils/randomCode';
+import AchievementService from '../../services/AchievementService';
+import GoalService from '../../services/GoalService';
+import {MongoUserRepository} from '../../infrastructure/db/mongoDB/user/MongoUserRepository';
+import ConfirmationCodeRepository from '../../repositories/mongoDB/ConfirmationCodeRepository';
+import { AuthData } from '../../types/types';
+import { UserRepositoryInterface } from './UserRepository';
 
 export default class UserService {
-    static async registration(email: string, password: string): Promise<AuthData> {
+    constructor (readonly userRepo: UserRepositoryInterface){}
+    async registration(email: string, password: string): Promise<AuthData> {
         // checking the user for existence
-        const condidate = await UserRepository.findUserByEmail(email);
+        const condidate = await this.userRepo.findUserByEmail(email)
         if (condidate) {
             throw ApiError.badRequest(
                 `User with email ${email} already exists`
@@ -21,19 +23,18 @@ export default class UserService {
         // hashing the password
         const hashPassword = await bcrypt.hash(password, 8);
         // creating the user data to the DB
-        const user = await UserRepository.createUserWithEmail(email, hashPassword);
+        const user = await this.userRepo.createUserWithEmail(email, hashPassword);
         // creating DTO of the user, generating the tokens, hashing the refresh token,
         // saving the hash of the token to the DB, returning the user data and tokens
         const authData = await TokenService.tokenService(user);
         // creating default ets
-        AchievementService.createDefaultAchievements(String(user._id));
+        AchievementService.createDefaultAchievements(user.id);
         return authData;
     }
 
-    static async login(email: string, password: string) {
+    async login(email: string, password: string) {
         // checking the user for existence
-        const user = await UserRepository.findUserByEmail(email);
-        console.log(user)
+        const user = await this.userRepo.findUserByEmail(email);
         if (!user) {
             throw ApiError.badRequest(
                 `User with email ${email} does not exist`
@@ -53,9 +54,9 @@ export default class UserService {
         return tokens;
     }
 
-    static async forgot(email: string) {
+    async forgot(email: string) {
         // Checking if the user exists
-        const user = await UserRepository.findUserByEmail(email);
+        const user = await this.userRepo.findUserByEmail(email);
         if (!user) {
             throw ApiError.badRequest(`User with mail ${email} does not exist`);
         }
@@ -65,25 +66,25 @@ export default class UserService {
         // hashing the code
         const hashCode = await bcrypt.hash(code, 8);
         // looking for another code
-        const codeFromDB = await ConfirmationCodeRepository.findConfirmatioanCode(String(user._id));
+        const codeFromDB = await ConfirmationCodeRepository.findConfirmatioanCode(user.id);
         // changing the code if we already have it in the DB
         if (codeFromDB) {
             await ConfirmationCodeRepository.updateConfirmationCode(String(codeFromDB._id), hashCode)
             return { message: 'Code is sent' };
         }
         // creating code in the DB
-        await ConfirmationCodeRepository.createConfirmationCode(String(user._id), hashCode)
+        await ConfirmationCodeRepository.createConfirmationCode(user.id, hashCode)
         return { message: 'Code is sent' };
     }
 
-    static async checkCode(email: string, code: string) {
+    async checkCode(email: string, code: string) {
         // looking for the user by the email
-        const user = await UserRepository.findUserByEmail(email);
+        const user = await this.userRepo.findUserByEmail(email);
         if (!user) {
             throw ApiError.badRequest(`User with mail ${email} does not exist`);
         }
         // looking for the code by the user ID
-        const codeFromDB = await ConfirmationCodeRepository.findConfirmatioanCode(String(user._id));
+        const codeFromDB = await ConfirmationCodeRepository.findConfirmatioanCode(user.id);
         if (!codeFromDB) {
             throw ApiError.badRequest(`Code does not exist`);
         }
@@ -95,14 +96,14 @@ export default class UserService {
         return { message: 'Code is okay' };
     }
 
-    static async reset(email: string, code: string, password: string) {
+    async reset(email: string, code: string, password: string) {
         // looking for the user by the email
-        const user = await UserRepository.findUserByEmail(email);
+        const user = await this.userRepo.findUserByEmail(email);
         if (!user) {
             throw ApiError.badRequest(`User with mail ${email} does not exist`);
         }
         // looking for the code by the user ID
-        const codeFromDB = await ConfirmationCodeRepository.findConfirmatioanCode(String(user._id))
+        const codeFromDB = await ConfirmationCodeRepository.findConfirmatioanCode(user.id)
         if (!codeFromDB) {
             throw ApiError.badRequest(`Some error`);
         }
@@ -114,14 +115,14 @@ export default class UserService {
         // hashing the passwrod
         const hashPassword = await bcrypt.hash(password, 8);
         // updating password
-        await UserRepository.changePassword(String(user._id), hashPassword)
+        await this.userRepo.changePassword(user.id, hashPassword)
         // deleting the code from the DB
         await ConfirmationCodeRepository.deleteCode(String(codeFromDB._id))
 
         return { message: 'Password was changed' };
     }
 
-    static async changePassword(
+    async changePassword(
         userId: string,
         oldPassword: string,
         newPassword: string
@@ -132,10 +133,7 @@ export default class UserService {
             );
         }
         // find user from DB
-        const user = await UserRepository.findById(userId);
-        if (!user) {
-            throw ApiError.serverError('User not found');
-        }
+        const user = await this.userRepo.findById(userId);
         // user signed up through google account
         if (!user.password) {
             throw ApiError.badRequest(
@@ -149,15 +147,13 @@ export default class UserService {
         }
         // hash new password and change it
         const hashPassword = await bcrypt.hash(newPassword, 8);
-        await UserRepository.changePassword(String(user._id), hashPassword)
+        await this.userRepo.changePassword(user.id, hashPassword)
         return { message: 'Password was changed' };
     }
 
-    static async confirmEmail(userId: string) {
-        const user = await UserRepository.findById(userId);
-        if (!user) {
-            throw ApiError.badRequest('User not found');
-        }
+    async confirmEmail(userId: string) {
+        const user = await this.userRepo.findById(userId);
+
         const email = user.email;
         // generating and sending the random code
         const code = randomCode();
@@ -176,11 +172,8 @@ export default class UserService {
         return { message: 'Code is sent' };
     }
 
-    static async confirmCodeEmail(userId: string, code: string) {
-        const user = await UserRepository.findById(userId);
-        if (!user) {
-            throw ApiError.badRequest('User not found');
-        }
+    async confirmCodeEmail(userId: string, code: string) {
+        const user = await this.userRepo.findById(userId);
         // looking for the code by the user ID
         const codeFromDB = await ConfirmationCodeRepository.findConfirmatioanCode(userId);
         if (!codeFromDB) {
@@ -192,20 +185,19 @@ export default class UserService {
             throw ApiError.badRequest('Wrong code');
         }
 
-        await UserRepository.verifyEmail(String(user._id))
+        await this.userRepo.verifyEmail(user.id)
         return { message: 'Email is confirmed' };
     }
 
-    static async deleteUser(userId: string) {
-        const user = await UserRepository.findById(userId);
-        if (!user) {
-            throw ApiError.badRequest('User does not exist');
-        }
+    async deleteUser(userId: string) {
+        const user = await this.userRepo.findById(userId);
 
-        await UserRepository.deleteUser(String(user._id))
+        await this.userRepo.deleteUser(user.id)
         await TokenService.removeTokenById(userId);
         await AchievementService.removeAchievements(userId);
         await GoalService.removeGoals(userId);
         return { message: 'User was deleted' };
     }
 }
+const userRepo = new MongoUserRepository()
+const userService = new UserService(userRepo)

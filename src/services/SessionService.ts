@@ -1,9 +1,11 @@
 import ApiError from '../core/errors/ApiError';
-import UserRepository from '../repositories/mongoDB/UserRepository';
+import { UserRepositoryInterface } from '../domain/user/UserRepository';
+import {MongoUserRepository} from '../infrastructure/db/mongoDB/user/MongoUserRepository';
 import TokenService from './TokenService';
 
 export default class SessionService {
-    static async logout(refreshToken: string | undefined) {
+    constructor(readonly userRepo: UserRepositoryInterface){}
+    async logout(refreshToken: string | undefined) {
         if (!refreshToken) {
             throw ApiError.unauthorizedError();
         }
@@ -11,7 +13,7 @@ export default class SessionService {
         return token;
     }
 
-    static async refresh(refreshToken: string | undefined) {
+    async refresh(refreshToken: string | undefined) {
         // checking the token for existence
         if (!refreshToken) {
             throw ApiError.unauthorizedError();
@@ -24,7 +26,7 @@ export default class SessionService {
         }
         // creating DTO of the user, generating the tokens, hashing the refresh token,
         // saving the hash of the token to the DB, returning the user data and tokens
-        const user = await UserRepository.findById(userData.id);
+        const user = await this.userRepo.findById(userData.id);
         const tokens = await TokenService.tokenService(user);
         return tokens;
     }

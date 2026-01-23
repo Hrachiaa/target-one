@@ -1,52 +1,53 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import AuthService from '../services/AuthService';
+import UserService from '../../../domain/user/UserService';
 
 interface Auth {
     email: string;
     password: string;
 }
 
-export default class AuthControllers {
-    static async registration(
+export default class UserController {
+    constructor(readonly userService: UserService){}
+    async registration(
         request: FastifyRequest<{ Body: Auth }>,
         reply: FastifyReply
     ) {
         const { email, password } = request.body;
-        const userData = await AuthService.registration(email, password);
+        const userData = await this.userService.registration(email, password);
         return reply.send(userData);
     }
 
-    static async login(
+    async login(
         request: FastifyRequest<{ Body: Auth }>,
         reply: FastifyReply
     ) {
         const email = request.body.email.trim().toLowerCase();
         const password = request.body.password;
-        const userData = await AuthService.login(email, password);
+        const userData = await this.userService.login(email, password);
         return reply.send(userData);
     }
 
-    static async forgot(
+    async forgot(
         request: FastifyRequest<{ Body: { email: string } }>,
         reply: FastifyReply
     ) {
         const email = request.body.email.trim().toLowerCase();
-        const data = await AuthService.forgot(email);
+        const data = await this.userService.forgot(email);
         return reply.send(data);
     }
 
-    static async checkCode(
+    async checkCode(
         request: FastifyRequest<{ Body: { email: string; code: string } }>,
         reply: FastifyReply
     ) {
         const email = request.body.email.trim().toLowerCase();
 
         const { code } = request.body;
-        const data = await AuthService.checkCode(email, code);
+        const data = await this.userService.checkCode(email, code);
         return reply.send(data);
     }
 
-    static async reset(
+    async reset(
         request: FastifyRequest<{
             Body: { email: string; code: string; password: string };
         }>,
@@ -55,11 +56,11 @@ export default class AuthControllers {
         const email = request.body.email.trim().toLowerCase();
 
         const { code, password } = request.body;
-        const data = await AuthService.reset(email, code, password);
+        const data = await this.userService.reset(email, code, password);
         return reply.send(data);
     }
 
-    static async changePassword(
+    async changePassword(
         request: FastifyRequest<{
             Body: { oldPassword: string; newPassword: string };
         }>,
@@ -67,7 +68,7 @@ export default class AuthControllers {
     ) {
         const user = await request.accessJwtVerify<{ id: string }>();
         const { oldPassword, newPassword } = request.body;
-        const changePassword = await AuthService.changePassword(
+        const changePassword = await this.userService.changePassword(
             user.id,
             oldPassword,
             newPassword
@@ -75,13 +76,13 @@ export default class AuthControllers {
         return reply.send(changePassword);
     }
 
-    static async confirmEmail(request: FastifyRequest, reply: FastifyReply) {
+    async confirmEmail(request: FastifyRequest, reply: FastifyReply) {
         const user = await request.accessJwtVerify<{ id: string }>();
-        const confirm = await AuthService.confirmEmail(user.id);
+        const confirm = await this.userService.confirmEmail(user.id);
         return reply.send(confirm);
     }
 
-    static async confirmCodeEmail(
+    async confirmCodeEmail(
         request: FastifyRequest<{
             Body: { code: string };
         }>,
@@ -90,17 +91,17 @@ export default class AuthControllers {
         const user = await request.accessJwtVerify<{ id: string }>();
         const { code } = request.body;
 
-        const confirm = await AuthService.confirmCodeEmail(user.id, code);
+        const confirm = await this.userService.confirmCodeEmail(user.id, code);
         return reply.send(confirm);
     }
 
-    static async deleteUser(request: FastifyRequest, reply: FastifyReply) {
+    async deleteUser(request: FastifyRequest, reply: FastifyReply) {
         const user = await request.accessJwtVerify<{ id: string }>();
-        const deleted = await AuthService.deleteUser(user.id);
+        const deleted = await this.userService.deleteUser(user.id);
         return reply.send(deleted);
     }
 
-    static async tokenTest(request: FastifyRequest, reply: FastifyReply) {
+    async tokenTest(request: FastifyRequest, reply: FastifyReply) {
         await request.accessJwtVerify();
         return reply.send({ message: 'Token is okay' });
     }

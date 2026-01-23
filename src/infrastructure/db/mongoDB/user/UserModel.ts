@@ -1,4 +1,16 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
+
+export interface UserDocument {
+    _id: Types.ObjectId;
+    email: string;
+    emailVerified: boolean;
+    googleId?: string | null;
+    password?: string | null;
+    avatar: string;
+    createdAt: NativeDate;
+    updatedAt: NativeDate
+    __v: number;
+}
 
 const UserSchema = new Schema(
     {

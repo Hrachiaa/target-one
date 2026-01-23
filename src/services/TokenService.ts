@@ -1,6 +1,6 @@
 import ApiError from '../core/errors/ApiError';
 import TokenRepository from '../repositories/mongoDB/TokenRepository';
-import UserDto from '../dtos/UserDto';
+import UserDto from '../domain/user/dtos/UserDto';
 import { fastify } from '../server';
 import bcrypt from 'bcryptjs';
 

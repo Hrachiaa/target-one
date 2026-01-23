@@ -5,15 +5,15 @@ export default class UserDto {
     email: string;
     googleId: string | null;
     constructor({
-        _id,
+        id,
         email,
         googleId = null,
     }: {
-        _id: Types.ObjectId;
+        id: string;
         email: string;
         googleId: string | null;
     }) {
-        this.id = String(_id);
+        this.id = id;
         this.email = email;
         this.googleId = googleId;
     }

@@ -1,4 +1,4 @@
-import UserDto from "../dtos/UserDto";
+import UserDto from "../domain/user/dtos/UserDto";
 
 export interface AuthData {
     user: UserDto;
