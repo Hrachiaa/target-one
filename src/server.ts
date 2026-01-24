@@ -4,8 +4,7 @@ const Fastify = require('fastify');
 import jwt from '@fastify/jwt';
 import fastifyOauth2 from '@fastify/oauth2';
 import mongoose from 'mongoose';
-import userRoutes from './domain/user/userRoutes';
-import oauthRoutes from './routes/oauthRoutes';
+import userRoutes from './infrastructure/controllers/user/userRoutes';
 import errorHandler from './middlewares/errorHandler';
 import sessionRoutes from './routes/sessionRoutes';
 import goalRoutes from './routes/goalRoutes';
@@ -36,29 +35,28 @@ fastify.register(jwt, {
     jwtSign: 'refreshJwtSign',
 });
 
-// fastify.register(fastifyOauth2, {
-//     name: 'googleOAuth2',
-//     scope: ['openid', 'email', 'profile'],
-//     credentials: {
-//         client: {
-//             id: process.env.GOOGLE_CLIENT_ID,
-//             secret: process.env.GOOGLE_CLIENT_SECRET,
-//         },
-//         // auth: fastifyOauth2.GOOGLE_CONFIGURATION,
-//     },
-//     startRedirectPath: '/api/oauth/google/login',
-//     callbackUri: 'http://localhost:5000/api/oauth/google/callback',
-//     discovery: {
-//         issuer: 'https://accounts.google.com',
-//     },
-// });
+fastify.register(fastifyOauth2, {
+    name: 'googleOAuth2',
+    scope: ['openid', 'email', 'profile'],
+    credentials: {
+        client: {
+            id: process.env.GOOGLE_CLIENT_ID,
+            secret: process.env.GOOGLE_CLIENT_SECRET,
+        },
+        // auth: fastifyOauth2.GOOGLE_CONFIGURATION,
+    },
+    startRedirectPath: '/api/user/google/login',
+    callbackUri: 'http://localhost:5000/api/user/google/callback',
+    discovery: {
+        issuer: 'https://accounts.google.com',
+    },
+});
 
 const userRepo = new MongoUserRepository()
 const userService = new UserService(userRepo)
 export const userController = new UserControllers(userService)
-fastify.register(userRoutes, { prefix: '/api/auth', controller: userController });
+fastify.register(userRoutes, { prefix: '/api/user', controller: userController });
 
-// fastify.register(oauthRoutes, { prefix: '/api/oauth' });
 // fastify.register(sessionRoutes, { prefix: '/api/session' });
 // fastify.register(goalRoutes, { prefix: '/api/goal' });
 // fastify.register(balanceRoutes, { prefix: '/api/balance' });

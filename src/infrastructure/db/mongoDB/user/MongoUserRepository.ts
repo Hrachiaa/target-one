@@ -1,9 +1,7 @@
 import ApiError from "../../../../core/errors/ApiError";
 import { UserRepositoryInterface } from "../../../../domain/user/UserRepository";
-import { UserMapper } from "./UserMapper";
+import { mapper } from "./UserMapper";
 import UserModel, { UserDocument } from "./UserModel";
-
-const mapper = new UserMapper()
 
 export class MongoUserRepository implements UserRepositoryInterface {
     async findUserByEmail (email: string){
@@ -14,13 +12,13 @@ export class MongoUserRepository implements UserRepositoryInterface {
 
     async findUserByGoogleId (googleId: string){
         const user: UserDocument | null = await UserModel.findOne({googleId})
-        if (!user) throw ApiError.badRequest('User not found')
+        if (!user) return null
         return mapper.toEntity(user)    
     }
 
     async findUserWithEmail (email: string, googleId: null = null ){
         const user: UserDocument | null = await UserModel.findOne({email, googleId})
-        if (!user) throw ApiError.badRequest('User not found')
+        if (!user) return null
         return mapper.toEntity(user)
     }
 

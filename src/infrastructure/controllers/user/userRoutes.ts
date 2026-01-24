@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
-import UserController from '../../infrastructure/controllers/user/UserController';
-import authRouteSchemas from '../../schemas/authRouteSchemas';
-import { userController } from '../../server';
+import UserController from './UserController';
+import authRouteSchemas from '../../../schemas/authRouteSchemas';
+import { userController } from '../../../server';
 
 const userRoutes = async (app: FastifyInstance, opts: { controller: UserController }) => {
     const { controller } = opts
@@ -41,12 +41,13 @@ const userRoutes = async (app: FastifyInstance, opts: { controller: UserControll
         // },
         controller.reset.bind(controller)
     );
-    app.post('/changepassword', controller.changePassword);
-    app.get('/confirmemail', controller.confirmEmail);
-    app.post('/checkconfirmcode', controller.confirmCodeEmail);
-    app.post('/deleteuser', controller.deleteUser);
+    app.post('/changepassword', controller.changePassword.bind(controller));
+    app.get('/confirmemail', controller.confirmEmail.bind(controller));
+    app.post('/checkconfirmcode', controller.confirmCodeEmail.bind(controller));
+    app.post('/deleteuser', controller.deleteUser.bind(controller));
 
-    app.get('/tokentest', controller.tokenTest);
+    app.get('/google/callback', controller.callback.bind(controller));
+
 };
 
 export default userRoutes;

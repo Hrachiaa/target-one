@@ -1,8 +1,16 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
+
+export interface CodeDocument{
+    _id: Types.ObjectId;
+    userId: String;
+    code: string;
+    createdAt: NativeDate;
+    __v: number;
+}
 
 const ConfirmationCodeSchema = new Schema({
     userId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         required: true,
         ref: 'User',
         unique: true,

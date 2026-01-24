@@ -1,5 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import UserService from '../../../domain/user/UserService';
+import { fastify } from '../../../server';
+import { GoogleUserDto } from '../../../domain/user/dtos/GoogleUserDto';
 
 interface Auth {
     email: string;
@@ -101,8 +103,14 @@ export default class UserController {
         return reply.send(deleted);
     }
 
-    async tokenTest(request: FastifyRequest, reply: FastifyReply) {
-        await request.accessJwtVerify();
-        return reply.send({ message: 'Token is okay' });
-    }
+    async callback(request: FastifyRequest, reply: FastifyReply) {
+            const { token } =
+                await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(
+                    request
+                );
+            const userInfo = await fastify.googleOAuth2.userinfo(token.access_token);
+            const googleUserDto = new GoogleUserDto(userInfo)
+            const userData = await this.userService.auth(googleUserDto);
+            return reply.send(userData);
+        }
 }

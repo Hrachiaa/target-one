@@ -4,8 +4,8 @@ export interface UserDocument {
     _id: Types.ObjectId;
     email: string;
     emailVerified: boolean;
-    googleId?: string | null;
-    password?: string | null;
+    googleId: string | null;
+    password: string | null;
     avatar: string;
     createdAt: NativeDate;
     updatedAt: NativeDate
@@ -23,8 +23,8 @@ const UserSchema = new Schema(
             required: true,
         },
         emailVerified: { type: Boolean, default: false },
-        googleId: { type: String, unique: true, sparse: true },
-        password: { type: String },
+        googleId: { type: String, unique: true, sparse: true, default: null },
+        password: { type: String, default: null },
         avatar: { type: String, default: 'https://cdn/first-login.png' },
     },
     { timestamps: true }
