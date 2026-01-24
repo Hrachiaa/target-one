@@ -1,9 +1,9 @@
 import { FastifyInstance } from 'fastify';
-import SessionController from '../controllers/SessionController';
 import BalanceController from '../controllers/BalanceController';
+import { sessionController } from '../server';
 
 const balanceRoutes = async (app: FastifyInstance) => {
-    app.addHook('preHandler', SessionController.authentication);
+    app.addHook('preHandler', sessionController.authentication);
     app.get('/', BalanceController.getBalance);
 };
 

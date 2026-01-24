@@ -1,8 +1,15 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
+
+export interface TokenDocument {
+    _id: Types.ObjectId;
+    userId: string;
+    refreshToken: string;
+    __v: number
+}
 
 const TokenSchema = new Schema({
     userId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'User',
         required: true,
         unique: true,

@@ -6,13 +6,16 @@ import fastifyOauth2 from '@fastify/oauth2';
 import mongoose from 'mongoose';
 import userRoutes from './infrastructure/controllers/user/userRoutes';
 import errorHandler from './middlewares/errorHandler';
-import sessionRoutes from './routes/sessionRoutes';
 import goalRoutes from './routes/goalRoutes';
 import balanceRoutes from './routes/balanceRoutes';
 import achievementRoutes from './routes/achievementRoutes';
 import {MongoUserRepository} from './infrastructure/db/mongoDB/user/MongoUserRepository';
 import UserService from './domain/user/UserService';
 import UserControllers from './infrastructure/controllers/user/UserController';
+import sessionRoutes from './infrastructure/controllers/session/sessionRoutes';
+import { MongoTokenRepository } from './infrastructure/db/mongoDB/token/MongoTokenRepository';
+import { TokenService } from './domain/token/TokenService';
+import SessionController from './infrastructure/controllers/session/SessionController';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -53,11 +56,15 @@ fastify.register(fastifyOauth2, {
 });
 
 const userRepo = new MongoUserRepository()
-const userService = new UserService(userRepo)
-export const userController = new UserControllers(userService)
+export const userService = new UserService(userRepo)
+const userController = new UserControllers(userService)
 fastify.register(userRoutes, { prefix: '/api/user', controller: userController });
 
-// fastify.register(sessionRoutes, { prefix: '/api/session' });
+const tokenRepo = new MongoTokenRepository()
+export const tokenService = new TokenService(tokenRepo)
+export const sessionController = new SessionController(tokenService)
+fastify.register(sessionRoutes, { prefix: '/api/session', controller: sessionController});
+
 // fastify.register(goalRoutes, { prefix: '/api/goal' });
 // fastify.register(balanceRoutes, { prefix: '/api/balance' });
 // fastify.register(achievementRoutes, { prefix: '/api/achievement' });
