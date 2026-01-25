@@ -1,4 +1,4 @@
-import ApiError from '../../core/errors/ApiError';
+import ApiError from '../utils/errors/ApiError';
 import UserDto from '../user/dtos/UserDto';
 import { fastify, userService } from '../../server';
 import bcrypt from 'bcryptjs';

@@ -1,18 +1,24 @@
 import { Types } from "mongoose";
-import DEFAULT_ACHIEVEMENTS from "../../../../config/defaultAchievements";
-import AchievementModel from "./AchievementModel";
+import DEFAULT_ACHIEVEMENTS from "../../../../domain/achievement/utils/defaultAchievements";
+import AchievementModel, { AchievementsDocument } from "./AchievementModel";
+import { mapper } from "./AchievementMapper";
+import { AchievementRepositoryInterface } from "../../../../domain/achievement/AchievementRepository";
 
-export default class AchievementRepository {
-    static async createAchievements(userId: string){
-        return await AchievementModel.create({userId, achievements: DEFAULT_ACHIEVEMENTS})
+export class MongoAchievementRepository implements AchievementRepositoryInterface{
+    async createAchievements(userId: string){
+        const achieves: AchievementsDocument = await AchievementModel.create({userId, achievements: DEFAULT_ACHIEVEMENTS})
+        return mapper.toEntity(achieves)
     }
 
-    static async findByUserId(userId: string){
-        return await AchievementModel.findOne({userId})
+    async findByUserId(userId: string){
+        const achieves: AchievementsDocument | null = await AchievementModel.findOne({userId})
+        if(!achieves) return null 
+        return mapper.toEntity(achieves)
+
     }
     
-    static async findIfUnlocked(userId: string, achievementId: string){
-        return await AchievementModel.findOne(
+    async findIfUnlocked(userId: string, achievementId: string){
+        const achieves: AchievementsDocument | null = await AchievementModel.findOne(
             {
                 userId,
                 achievements: {
@@ -26,10 +32,12 @@ export default class AchievementRepository {
                 'achievements.$': 1,
             }
         );
+        if(!achieves) return null 
+        return mapper.toEntity(achieves)
     }
 
-    static async unlockAchievement(userId: string, achievementId: string, price: number){
-        return await AchievementModel.findOneAndUpdate(
+    async unlockAchievement(userId: string, achievementId: string){
+        const achieves: AchievementsDocument | null = await AchievementModel.findOneAndUpdate(
             {
                 userId,
                 achievements: {
@@ -41,7 +49,6 @@ export default class AchievementRepository {
             },
             {
                 $set: { 'achievements.$[inner].isUnlocked': true },
-                $inc: { balance: -price },
             },
             {
                 arrayFilters: [
@@ -50,9 +57,12 @@ export default class AchievementRepository {
                 new: true,
             }
         )
+        if(!achieves) return null 
+        return mapper.toEntity(achieves)
     }
 
-    static async deleteAll (userId: string){
-        return await AchievementModel.findOneAndDelete({userId})
+    async deleteAll (userId: string){
+        await AchievementModel.findOneAndDelete({userId})
+        return
     }
 }

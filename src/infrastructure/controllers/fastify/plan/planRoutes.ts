@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import GoalController from '../controllers/GoalController';
-import { sessionController } from '../server';
+import GoalController from './PlanController';
+import { sessionController } from '../../../server';
 
 const goalRoutes = async (app: FastifyInstance) => {
     app.addHook('preHandler', sessionController.authentication);

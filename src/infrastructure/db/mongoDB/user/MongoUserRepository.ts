@@ -1,4 +1,4 @@
-import ApiError from "../../../../core/errors/ApiError";
+import ApiError from "../../../../domain/utils/errors/ApiError";
 import { UserRepositoryInterface } from "../../../../domain/user/UserRepository";
 import { mapper } from "./UserMapper";
 import UserModel, { UserDocument } from "./UserModel";

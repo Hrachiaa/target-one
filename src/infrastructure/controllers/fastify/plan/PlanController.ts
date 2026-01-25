@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import GoalService from '../domain/plan/PlanService';
+import GoalService from '../../../domain/plan/PlanService';
 
 export default class GoalController {
     static async create(

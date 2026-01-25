@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import PlanModel from "../../models/PlanModel";
+import PlanModel from "./PlanModel";
 
 export default class PlanRepository {
     static async createPlan (userId: string, plan: {task: string}[][]){

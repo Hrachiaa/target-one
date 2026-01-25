@@ -1,32 +1,30 @@
-import ApiError from '../../core/errors/ApiError';
-import AchievementRepository from '../../infrastructure/db/mongoDB/achievement/MongoAchievementRepository';
-import {MongoUserRepository} from '../../infrastructure/db/mongoDB/user/MongoUserRepository';
+import ApiError from '../utils/errors/ApiError';
 import { userService } from '../../server';
-
-const mongoUserRepository = new MongoUserRepository()
+import { AchievementRepositoryInterface } from './AchievementRepository';
 
 export default class AchievementService {
-    static async createDefaultAchievements(userId: string): Promise<undefined> {
-        const doc = await AchievementRepository.findByUserId(userId);
+    constructor(readonly achievementRepo: AchievementRepositoryInterface){}
+    async createDefaultAchievements(userId: string): Promise<void> {
+        const doc = await this.achievementRepo.findByUserId(userId);
 
         if (!doc) {
-            await AchievementRepository.createAchievements(userId)
+            await this.achievementRepo.createAchievements(userId)
             return
         }
         return;
         // TODO: later — check for missing achievements and add them if document exists
     }
 
-    static async getAchievements(userId: string) {
-        const achievements = await AchievementRepository.findByUserId(userId);
+    async getAchievements(userId: string) {
+        const achievements = await this.achievementRepo.findByUserId(userId);
         if (!achievements) {
             throw ApiError.badRequest('Achievements not found');
         }
         return achievements;
     }
 
-    static async unlockUchievment(userId: string, achievementId: string) {
-        const achievements = await AchievementService.getAchievements(userId);
+    async unlockUchievment(userId: string, achievementId: string) {
+        const achievements = await this.getAchievements(userId);
         const achiev = achievements.achievements.find(
             (a: any) => a._id.toString() === achievementId
         );
@@ -39,7 +37,8 @@ export default class AchievementService {
             throw ApiError.badRequest('User has no enough balance');
         }
 
-        const updated = await AchievementRepository.unlockAchievement(userId, achievementId, achiev.price)
+        const updated = await this.achievementRepo.unlockAchievement(userId, achievementId)
+        await userService.decreaseBalance(userId, achiev.price)
         if (!updated) {
             throw ApiError.badRequest('Achievement is already mark as unlocked');
         }
@@ -47,23 +46,23 @@ export default class AchievementService {
         return updated;
     }
 
-    static async setAvatar(userId: string, achievementId: string) {
-        const user = await mongoUserRepository.findById(userId);
+    async setAvatar(userId: string, achievementId: string) {
+        const user = await userService.findById(userId);
         if (!user) {
             throw ApiError.serverError('User not found');
         }
 
-        const achievement = await AchievementRepository.findIfUnlocked(userId, achievementId)
+        const achievement = await this.achievementRepo.findIfUnlocked(userId, achievementId)
         if (!achievement) {
             throw ApiError.badRequest('Achievement not unlocked');
         }
 
         const achievementLink = achievement.achievements[0].icon;
 
-        return await mongoUserRepository.setAvatar(userId, achievementLink)
+        return await userService.setAvatar(userId, achievementLink)
     }
 
-    static async removeAchievements(userId: string) {
-        await AchievementRepository.deleteAll(userId);
+    async removeAchievements(userId: string) {
+        await this.achievementRepo.deleteAll(userId);
     }
 }

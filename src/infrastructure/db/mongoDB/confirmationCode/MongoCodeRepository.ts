@@ -1,4 +1,4 @@
-import ApiError from "../../../../core/errors/ApiError";
+import ApiError from "../../../../domain/utils/errors/ApiError";
 import { CodeRepositoryInterface } from "../../../../domain/confirmationCode/CodeRepository";
 import { mapper } from "./CodeMapper";
 import ConfirmationCodeModel, { CodeDocument } from "./CodeModel";

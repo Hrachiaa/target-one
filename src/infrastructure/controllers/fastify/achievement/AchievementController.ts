@@ -1,17 +1,18 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import AchievementService from '../../../domain/achievement/AchievementService';
+import AchievementService from '../../../../domain/achievement/AchievementService';
 
 export default class AchievementController {
-    static async getAchievments(
+    constructor(readonly achievementService: AchievementService){}
+    async getAchievments(
         request: FastifyRequest<{ Body: {}; userId: string }>,
         reply: FastifyReply
     ) {
         const userId = request.userId!;
-        const achievements = await AchievementService.getAchievements(userId);
+        const achievements = await this.achievementService.getAchievements(userId);
         return reply.send(achievements);
     }
 
-    static async unlockUchievment(
+    async unlockUchievment(
         request: FastifyRequest<{
             Body: { achievementId: string };
             userId: string;
@@ -20,14 +21,14 @@ export default class AchievementController {
     ) {
         const userId = request.userId!;
         const { achievementId } = request.body;
-        const unlock = await AchievementService.unlockUchievment(
+        const unlock = await this.achievementService.unlockUchievment(
             userId,
             achievementId
         );
         return reply.send(unlock);
     }
 
-    static async setAvatar(
+    async setAvatar(
         request: FastifyRequest<{
             Body: { achievementId: string };
             userId: string;
@@ -36,7 +37,7 @@ export default class AchievementController {
     ) {
         const userId = request.userId!;
         const { achievementId } = request.body;
-        const setAvatar = await AchievementService.setAvatar(
+        const setAvatar = await this.achievementService.setAvatar(
             userId,
             achievementId
         );

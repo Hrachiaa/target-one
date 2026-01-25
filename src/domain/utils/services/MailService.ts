@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import {
     emailTemplateConfirmCode,
     emailTemplateResetCode,
-} from '../utils/emailTemplate';
+} from './emailTemplate';
 
 class MailService {
     private transporter;

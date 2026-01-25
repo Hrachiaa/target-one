@@ -1,4 +1,4 @@
-import ApiError from "../../../../core/errors/ApiError";
+import ApiError from "../../../../domain/utils/errors/ApiError";
 import { TokenEntity } from "../../../../domain/token/models/TokenEntity";
 import { TokenRepositoryInterface } from "../../../../domain/token/TokenRepository";
 import { mapper } from "./TokenMapper";

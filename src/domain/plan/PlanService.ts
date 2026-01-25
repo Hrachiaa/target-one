@@ -1,10 +1,10 @@
 import { zodTextFormat } from 'openai/helpers/zod';
-import planPromt from '../../promts/planPromt';
-import questionsPromt from '../../promts/questionsPromt';
-import client from '../../config/openai';
-import ApiError from '../../core/errors/ApiError';
-import { questionsSchema, planSchema } from '../../schemas/goalSchemas';
-import PlanRepository from '../../repositories/mongoDB/PlanRepository';
+import planPromt from './promts/planPromt';
+import questionsPromt from './promts/questionsPromt';
+import {client} from '../../infrastructure/config/openai';
+import ApiError from '../utils/errors/ApiError';
+import { questionsSchema, planSchema } from './schemas/planSchemas';
+import PlanRepository from '../../infrastructure/db/mongoDB/plan/PlanRepository';
 import { userService } from '../../server';
 
 export default class GoalService {

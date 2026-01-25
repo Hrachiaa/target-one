@@ -1,20 +1,34 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 
-const AchievmentSchema = new Schema({
-    achievment_name: { type: String, required: true },
+export interface AchievementDocument {
+    _id: Types.ObjectId;
+    achievement_name: string;
+    icon: string;
+    price: number;
+    isUnlocked: boolean
+}
+
+export interface AchievementsDocument {
+    _id: Types.ObjectId;
+    userId: string;
+    achievements: AchievementDocument[];
+    __v: number;
+} 
+
+const AchievementSchema = new Schema({
+    achievement_name: { type: String, required: true },
     icon: { type: String, required: true },
     price: { type: Number, required: true },
     isUnlocked: { type: Boolean, default: false },
 });
 
-const AchievementSchema = new Schema({
+const AchievementsSchema = new Schema({
     userId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         unique: true,
-        ref: 'User',
         required: true,
     },
-    achievements: { type: [AchievmentSchema], required: true },
+    achievements: { type: [AchievementSchema], required: true },
 });
 
-export default model('Achievement', AchievementSchema);
+export default model('Achievement', AchievementsSchema);

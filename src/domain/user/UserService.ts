@@ -1,10 +1,9 @@
 import bcrypt from 'bcryptjs';
-import ApiError from '../../core/errors/ApiError';
-import MailService from '../../services/MailService';
-import randomCode from '../../utils/randomCode';
+import ApiError from '../utils/errors/ApiError';
+import MailService from '../utils/services/MailService';
+import {randomCode} from './utils/randomCode';
 import AchievementService from '../achievement/AchievementService';
 import GoalService from '../plan/PlanService';
-import {MongoUserRepository} from '../../infrastructure/db/mongoDB/user/MongoUserRepository';
 import { UserRepositoryInterface } from './UserRepository';
 import { GoogleUserDto } from './dtos/GoogleUserDto';
 import { codeService } from '../confirmationCode/CodeService';
@@ -245,6 +244,9 @@ export default class UserService {
         return ;
     }
 
+    async setAvatar(userId: string, avatar: string): Promise<UserEntity>{
+        return await this.userRepo.setAvatar(userId, avatar)
+    }
 
     async findById(userId: string): Promise<UserEntity>{
         return await this.userRepo.findById(userId)

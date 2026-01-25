@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import SessionController from './SessionController';
-import authRouteSchemas from '../../../schemas/authRouteSchemas';
+import authRouteSchemas from '../user/userRouteSchemas';
 
 const sessionRoutes = async (app: FastifyInstance, opts: {controller: SessionController}) => {
     const {controller} = opts

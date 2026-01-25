@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import UserController from './UserController';
-import authRouteSchemas from '../../../schemas/authRouteSchemas';
+import authRouteSchemas from './userRouteSchemas';
 
 const userRoutes = async (app: FastifyInstance, opts: { controller: UserController }) => {
     const { controller } = opts

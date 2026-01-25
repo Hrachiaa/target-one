@@ -4,17 +4,20 @@ const Fastify = require('fastify');
 import jwt from '@fastify/jwt';
 import fastifyOauth2 from '@fastify/oauth2';
 import mongoose from 'mongoose';
-import userRoutes from './infrastructure/controllers/user/userRoutes';
-import errorHandler from './middlewares/errorHandler';
-import goalRoutes from './routes/goalRoutes';
-import achievementRoutes from './infrastructure/controllers/achievement/achievementRoutes';
+import userRoutes from './infrastructure/controllers/fastify/user/userRoutes';
+import errorHandler from './infrastructure/controllers/fastify/errorHandler';
+import goalRoutes from './infrastructure/controllers/fastify/plan/planRoutes';
 import {MongoUserRepository} from './infrastructure/db/mongoDB/user/MongoUserRepository';
 import UserService from './domain/user/UserService';
-import UserControllers from './infrastructure/controllers/user/UserController';
-import sessionRoutes from './infrastructure/controllers/session/sessionRoutes';
+import UserControllers from './infrastructure/controllers/fastify/user/UserController';
+import sessionRoutes from './infrastructure/controllers/fastify/session/sessionRoutes';
 import { MongoTokenRepository } from './infrastructure/db/mongoDB/token/MongoTokenRepository';
 import { TokenService } from './domain/token/TokenService';
-import SessionController from './infrastructure/controllers/session/SessionController';
+import SessionController from './infrastructure/controllers/fastify/session/SessionController';
+import achievementRoutes from './infrastructure/controllers/fastify/achievement/achievementRoutes';
+import { MongoAchievementRepository } from './infrastructure/db/mongoDB/achievement/MongoAchievementRepository';
+import AchievementService from './domain/achievement/AchievementService';
+import AchievementController from './infrastructure/controllers/fastify/achievement/AchievementController';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -64,8 +67,12 @@ export const tokenService = new TokenService(tokenRepo)
 export const sessionController = new SessionController(tokenService)
 fastify.register(sessionRoutes, { prefix: '/api/session', controller: sessionController});
 
+const achievementRepo = new MongoAchievementRepository()
+const achievementService = new AchievementService(achievementRepo)
+const achievementController = new AchievementController(achievementService)
+fastify.register(achievementRoutes, { prefix: '/api/achievement', controller: achievementController });
+
 // fastify.register(goalRoutes, { prefix: '/api/goal' });
-// fastify.register(achievementRoutes, { prefix: '/api/achievement' });
 fastify.setErrorHandler(errorHandler);
 
 const start = async () => {
