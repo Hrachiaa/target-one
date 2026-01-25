@@ -44,7 +44,7 @@ const userRoutes = async (app: FastifyInstance, opts: { controller: UserControll
     app.get('/confirmemail', controller.confirmEmail.bind(controller));
     app.post('/checkconfirmcode', controller.confirmCodeEmail.bind(controller));
     app.post('/deleteuser', controller.deleteUser.bind(controller));
-
+    app.get('/balance', controller.getBalance.bind(controller));
     app.get('/google/callback', controller.callback.bind(controller));
 
 };

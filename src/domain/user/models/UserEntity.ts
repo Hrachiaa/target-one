@@ -5,6 +5,7 @@ export class UserEntity {
         readonly emailVerified: boolean,
         readonly googleId: string | null,
         readonly password: string | null,
+        readonly balance: number,
         readonly avatar: string
     ){}
 }

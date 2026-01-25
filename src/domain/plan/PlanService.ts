@@ -1,12 +1,11 @@
 import { zodTextFormat } from 'openai/helpers/zod';
-import planPromt from '../promts/planPromt';
-import questionsPromt from '../promts/questionsPromt';
-import client from '../config/openai';
-import ApiError from '../core/errors/ApiError';
-import PlanModel from '../models/PlanModel';
-import { questionsSchema, planSchema } from '../schemas/goalSchemas';
-import BalanceService from './BalanceService';
-import PlanRepository from '../repositories/mongoDB/PlanRepository';
+import planPromt from '../../promts/planPromt';
+import questionsPromt from '../../promts/questionsPromt';
+import client from '../../config/openai';
+import ApiError from '../../core/errors/ApiError';
+import { questionsSchema, planSchema } from '../../schemas/goalSchemas';
+import PlanRepository from '../../repositories/mongoDB/PlanRepository';
+import { userService } from '../../server';
 
 export default class GoalService {
     static model = 'gpt-4o-mini-2024-07-18';
@@ -14,7 +13,7 @@ export default class GoalService {
     static store = false;
 
     static async createQuestions(userId: string, goal: string) {
-        const plan = await client.responses.parse({
+        const questions = await client.responses.parse({
             model: this.model,
             temperature: this.temperature,
             input: questionsPromt(goal),
@@ -23,7 +22,7 @@ export default class GoalService {
             },
             store: this.store,
         });
-        return plan.output_parsed;
+        return questions.output_parsed;
     }
 
     static async createPlan(userId: string, goal: string) {
@@ -50,7 +49,7 @@ export default class GoalService {
         if (!updated) {
             throw ApiError.badRequest('Task is already done');
         }
-        await BalanceService.increaseBalance(userId, 20);
+        await userService.increaseBalance(userId, 20);
         return updated;
     }
 
@@ -59,7 +58,7 @@ export default class GoalService {
         if (!updated) {
             throw ApiError.badRequest('Task is already mark as not done');
         }
-        await BalanceService.decreaseBalance(userId, 20);
+        await userService.decreaseBalance(userId, 20);
         return updated;
     }
 

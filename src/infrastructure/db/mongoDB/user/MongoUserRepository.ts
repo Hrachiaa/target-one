@@ -67,4 +67,14 @@ export class MongoUserRepository implements UserRepositoryInterface {
         if(!user) return null
         return mapper.toEntity(user)
     }
+
+    async changeBalance(userId: string, amount: number) {
+        const user: UserDocument | null = await UserModel.findByIdAndUpdate(
+            userId,
+            { $inc: { balance: amount } },
+            { new: true }
+        );
+        if(!user) throw ApiError.serverError('Balance was not changed')
+        return mapper.toEntity(user)
+    }
 }

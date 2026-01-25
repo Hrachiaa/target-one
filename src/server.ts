@@ -7,8 +7,7 @@ import mongoose from 'mongoose';
 import userRoutes from './infrastructure/controllers/user/userRoutes';
 import errorHandler from './middlewares/errorHandler';
 import goalRoutes from './routes/goalRoutes';
-import balanceRoutes from './routes/balanceRoutes';
-import achievementRoutes from './routes/achievementRoutes';
+import achievementRoutes from './infrastructure/controllers/achievement/achievementRoutes';
 import {MongoUserRepository} from './infrastructure/db/mongoDB/user/MongoUserRepository';
 import UserService from './domain/user/UserService';
 import UserControllers from './infrastructure/controllers/user/UserController';
@@ -66,7 +65,6 @@ export const sessionController = new SessionController(tokenService)
 fastify.register(sessionRoutes, { prefix: '/api/session', controller: sessionController});
 
 // fastify.register(goalRoutes, { prefix: '/api/goal' });
-// fastify.register(balanceRoutes, { prefix: '/api/balance' });
 // fastify.register(achievementRoutes, { prefix: '/api/achievement' });
 fastify.setErrorHandler(errorHandler);
 

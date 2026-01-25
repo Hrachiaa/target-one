@@ -103,6 +103,15 @@ export default class UserController {
         return reply.send(deleted);
     }
 
+    async getBalance(
+        request: FastifyRequest,
+        reply: FastifyReply
+    ) {
+        const user = await request.accessJwtVerify<{ id: string }>();
+        const balance = await this.userService.getBalance(user.id);
+        return reply.send(balance);
+    }
+
     async callback(request: FastifyRequest, reply: FastifyReply) {
             const { token } =
                 await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(

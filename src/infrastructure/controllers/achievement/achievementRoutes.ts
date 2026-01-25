@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import AchievementController from '../controllers/AchievementController';
-import { sessionController } from '../server';
+import { sessionController } from '../../../server';
+import AchievementController from './AchievementController';
 
 const achievementRoutes = async (app: FastifyInstance) => {
     app.addHook('preHandler', sessionController.authentication);

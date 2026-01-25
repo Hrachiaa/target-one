@@ -14,7 +14,6 @@ const AchievementSchema = new Schema({
         ref: 'User',
         required: true,
     },
-    balance: { type: Number, default: 0 },
     achievements: { type: [AchievmentSchema], required: true },
 });
 

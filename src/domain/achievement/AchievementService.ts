@@ -1,7 +1,7 @@
-import BalanceService from './BalanceService';
-import ApiError from '../core/errors/ApiError';
-import {MongoUserRepository} from '../infrastructure/db/mongoDB/user/MongoUserRepository';
-import AchievementRepository from '../repositories/mongoDB/AchievementRepository';
+import ApiError from '../../core/errors/ApiError';
+import AchievementRepository from '../../infrastructure/db/mongoDB/achievement/MongoAchievementRepository';
+import {MongoUserRepository} from '../../infrastructure/db/mongoDB/user/MongoUserRepository';
+import { userService } from '../../server';
 
 const mongoUserRepository = new MongoUserRepository()
 
@@ -33,7 +33,7 @@ export default class AchievementService {
         if (!achiev) {
             throw ApiError.badRequest('Achievement not found');
         }
-        const balance = await BalanceService.getBalance(userId);
+        const balance = await userService.getBalance(userId);
 
         if (achiev.price > balance.balance) {
             throw ApiError.badRequest('User has no enough balance');

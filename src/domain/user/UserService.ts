@@ -2,8 +2,8 @@ import bcrypt from 'bcryptjs';
 import ApiError from '../../core/errors/ApiError';
 import MailService from '../../services/MailService';
 import randomCode from '../../utils/randomCode';
-import AchievementService from '../../services/AchievementService';
-import GoalService from '../../services/GoalService';
+import AchievementService from '../achievement/AchievementService';
+import GoalService from '../plan/PlanService';
 import {MongoUserRepository} from '../../infrastructure/db/mongoDB/user/MongoUserRepository';
 import { UserRepositoryInterface } from './UserRepository';
 import { GoogleUserDto } from './dtos/GoogleUserDto';
@@ -12,6 +12,7 @@ import { UserEntity } from './models/UserEntity';
 import { CodeEntity } from '../confirmationCode/models/CodeEntity';
 import { tokenService } from '../../server';
 import { TokensDto } from '../token/dtos/TokensDto';
+import { BalanceDto } from './dtos/UserDto';
 
 interface Message {
     message: string;
@@ -228,6 +229,22 @@ export default class UserService {
 
         return tokens;
     }
+
+    async getBalance(userId: string): Promise<BalanceDto> {
+        const user: UserEntity = await this.userRepo.findById(userId);
+        return { balance: user.balance };
+    }
+
+    async increaseBalance(userId: string, amount: number): Promise <void> {
+        await this.userRepo.changeBalance(userId, amount);
+        return ;
+    }
+
+    async decreaseBalance(userId: string, amount: number): Promise <void> {
+        await this.userRepo.changeBalance(userId, -amount);
+        return ;
+    }
+
 
     async findById(userId: string): Promise<UserEntity>{
         return await this.userRepo.findById(userId)

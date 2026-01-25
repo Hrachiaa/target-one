@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import AchievementService from '../services/AchievementService';
+import AchievementService from '../../../domain/achievement/AchievementService';
 
 export default class AchievementController {
     static async getAchievments(

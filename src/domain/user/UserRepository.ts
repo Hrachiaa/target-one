@@ -12,5 +12,5 @@ export interface UserRepositoryInterface {
     changePassword(userId: string, password: string): Promise<UserEntity>;
     verifyEmail(userId: string): Promise<UserEntity>;
     deleteUser(userId: string): Promise<UserEntity | null>;
-    
+    changeBalance(userId: string, amount: number): Promise<UserEntity>
 }

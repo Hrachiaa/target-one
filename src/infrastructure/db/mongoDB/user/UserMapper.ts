@@ -8,7 +8,7 @@ interface DBMapper<T> {
 
 class UserMapper implements DBMapper<undefined> {
     toEntity(user: UserDocument): UserEntity{
-        return new UserEntity(String(user._id), user.email, user.emailVerified, user.googleId, user.password, user.avatar)
+        return new UserEntity(String(user._id), user.email, user.emailVerified, user.googleId, user.password, user.balance, user.avatar)
     }
     toDB(user: UserEntity): undefined{
         return

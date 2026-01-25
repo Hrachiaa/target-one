@@ -16,3 +16,7 @@ export default class UserDto {
         this.googleId = googleId;
     }
 }
+
+export interface BalanceDto {
+    balance: number
+}

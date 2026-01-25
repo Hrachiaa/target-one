@@ -6,6 +6,7 @@ export interface UserDocument {
     emailVerified: boolean;
     googleId: string | null;
     password: string | null;
+    balance: number
     avatar: string;
     createdAt: NativeDate;
     updatedAt: NativeDate
@@ -25,6 +26,7 @@ const UserSchema = new Schema(
         emailVerified: { type: Boolean, default: false },
         googleId: { type: String, unique: true, sparse: true, default: null },
         password: { type: String, default: null },
+        balance: {type: Number, default: 0},
         avatar: { type: String, default: 'https://cdn/first-login.png' },
     },
     { timestamps: true }

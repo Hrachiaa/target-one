@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import DEFAULT_ACHIEVEMENTS from "../../config/defaultAchievements";
-import AchievementModel from "../../models/AchievementModel";
+import DEFAULT_ACHIEVEMENTS from "../../../../config/defaultAchievements";
+import AchievementModel from "./AchievementModel";
 
 export default class AchievementRepository {
     static async createAchievements(userId: string){
@@ -51,18 +51,6 @@ export default class AchievementRepository {
             }
         )
     }
-
-    static async getBalance (userId: string){
-        return await AchievementModel.findOne({userId})
-    }
-
-    static async changeBalance(userId: string, amount: number) {
-            return await AchievementModel.findOneAndUpdate(
-                { userId },
-                { $inc: { balance: amount } },
-                { new: true }
-            );
-        }
 
     static async deleteAll (userId: string){
         return await AchievementModel.findOneAndDelete({userId})

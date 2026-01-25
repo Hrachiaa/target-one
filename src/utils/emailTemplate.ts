@@ -1,6 +1,6 @@
 import dedent from 'ts-dedent';
 
-export function emailTemplateResetCode(code: string) {
+export function emailTemplateResetCode(code: string): string {
     return dedent(
         `
         <!DOCTYPE html>
@@ -23,7 +23,7 @@ export function emailTemplateResetCode(code: string) {
     );
 }
 
-export function emailTemplateConfirmCode(code: string) {
+export function emailTemplateConfirmCode(code: string): string {
     return dedent(
         `
         <!DOCTYPE html>
