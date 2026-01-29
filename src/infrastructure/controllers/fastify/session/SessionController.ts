@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { TokenService } from '../../../domain/token/TokenService';
+import { TokenService } from '../../../../domain/token/TokenService';
 
 
 export default class {

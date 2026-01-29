@@ -2,14 +2,12 @@ import bcrypt from 'bcryptjs';
 import ApiError from '../utils/errors/ApiError';
 import MailService from '../utils/services/MailService';
 import {randomCode} from './utils/randomCode';
-import AchievementService from '../achievement/AchievementService';
-import GoalService from '../plan/PlanService';
 import { UserRepositoryInterface } from './UserRepository';
 import { GoogleUserDto } from './dtos/GoogleUserDto';
 import { codeService } from '../confirmationCode/CodeService';
 import { UserEntity } from './models/UserEntity';
 import { CodeEntity } from '../confirmationCode/models/CodeEntity';
-import { tokenService } from '../../server';
+import { achievementService, planService, tokenService } from '../../server';
 import { TokensDto } from '../token/dtos/TokensDto';
 import { BalanceDto } from './dtos/UserDto';
 
@@ -35,7 +33,7 @@ export default class UserService {
         // saving the hash of the token to the DB, returning the user data and tokens
         const tokens: TokensDto = await tokenService.tokenService(user);
         // creating default ets
-        AchievementService.createDefaultAchievements(user.id);
+        achievementService.createDefaultAchievements(user.id);
         return tokens;
     }
 
@@ -201,8 +199,8 @@ export default class UserService {
 
         await this.userRepo.deleteUser(user.id)
         await tokenService.removeTokenById(userId);
-        await AchievementService.removeAchievements(userId);
-        await GoalService.removeGoals(userId);
+        await achievementService.removeAchievements(userId);
+        await planService.removeGoals(userId);
         return { message: 'User was deleted' };
     }
 
@@ -223,7 +221,7 @@ export default class UserService {
 
         const user: UserEntity = await this.userRepo.createUserWithGoogleId(googleUserDto.googleId, googleUserDto.email)
 
-        AchievementService.createDefaultAchievements(user.id.toString());
+        achievementService.createDefaultAchievements(user.id.toString());
         const tokens: TokensDto = await tokenService.tokenService(user);
 
         return tokens;

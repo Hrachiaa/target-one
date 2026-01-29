@@ -1,14 +1,14 @@
 import { FastifyInstance } from 'fastify';
-import GoalController from './PlanController';
-import { sessionController } from '../../../server';
+import { sessionController } from '../../../../server';
+import { PlanController } from './PlanController';
 
-const goalRoutes = async (app: FastifyInstance) => {
+export const planRoutes = async (app: FastifyInstance, opts: {controller: PlanController}) => {
+    const {controller} = opts
     app.addHook('preHandler', sessionController.authentication);
-    app.post('/create', GoalController.create);
-    app.post('/complete', GoalController.completePlanTask);
-    app.post('/uncomplete', GoalController.uncompletePlanTask);
-    app.get('/plans', GoalController.getUserPlans);
-    app.post('/delete', GoalController.deletePlan);
+    app.post('/create', controller.create.bind(controller));
+    app.post('/complete', controller.completePlanTask.bind(controller));
+    app.post('/uncomplete', controller.uncompletePlanTask.bind(controller));
+    app.get('/plans', controller.getUserPlans.bind(controller));
+    app.post('/delete', controller.deletePlan.bind(controller));
 };
 
-export default goalRoutes;

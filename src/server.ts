@@ -6,7 +6,6 @@ import fastifyOauth2 from '@fastify/oauth2';
 import mongoose from 'mongoose';
 import userRoutes from './infrastructure/controllers/fastify/user/userRoutes';
 import errorHandler from './infrastructure/controllers/fastify/errorHandler';
-import goalRoutes from './infrastructure/controllers/fastify/plan/planRoutes';
 import {MongoUserRepository} from './infrastructure/db/mongoDB/user/MongoUserRepository';
 import UserService from './domain/user/UserService';
 import UserControllers from './infrastructure/controllers/fastify/user/UserController';
@@ -18,6 +17,10 @@ import achievementRoutes from './infrastructure/controllers/fastify/achievement/
 import { MongoAchievementRepository } from './infrastructure/db/mongoDB/achievement/MongoAchievementRepository';
 import AchievementService from './domain/achievement/AchievementService';
 import AchievementController from './infrastructure/controllers/fastify/achievement/AchievementController';
+import { MongoPlanRepository } from './infrastructure/db/mongoDB/plan/MongoPlanRepository';
+import PlanService from './domain/plan/PlanService';
+import { PlanController } from './infrastructure/controllers/fastify/plan/PlanController';
+import { planRoutes } from './infrastructure/controllers/fastify/plan/planRoutes';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -68,11 +71,15 @@ export const sessionController = new SessionController(tokenService)
 fastify.register(sessionRoutes, { prefix: '/api/session', controller: sessionController});
 
 const achievementRepo = new MongoAchievementRepository()
-const achievementService = new AchievementService(achievementRepo)
+export const achievementService = new AchievementService(achievementRepo)
 const achievementController = new AchievementController(achievementService)
 fastify.register(achievementRoutes, { prefix: '/api/achievement', controller: achievementController });
 
-// fastify.register(goalRoutes, { prefix: '/api/goal' });
+const planRepo = new MongoPlanRepository()
+export const planService = new PlanService(planRepo)
+const planController = new PlanController(planService)
+fastify.register(planRoutes, { prefix: '/api/plan', controller: planController});
+
 fastify.setErrorHandler(errorHandler);
 
 const start = async () => {

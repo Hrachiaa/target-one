@@ -24,7 +24,7 @@ const UserSchema = new Schema(
             required: true,
         },
         emailVerified: { type: Boolean, default: false },
-        googleId: { type: String, unique: true, sparse: true, default: null },
+        googleId: { type: String, sparse: true, default: null },
         password: { type: String, default: null },
         balance: {type: Number, default: 0},
         avatar: { type: String, default: 'https://cdn/first-login.png' },

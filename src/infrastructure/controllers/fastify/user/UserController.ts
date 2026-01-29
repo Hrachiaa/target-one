@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import UserService from '../../../domain/user/UserService';
-import { fastify } from '../../../server';
-import { GoogleUserDto } from '../../../domain/user/dtos/GoogleUserDto';
+import { fastify } from '../../../../server';
+import { GoogleUserDto } from '../../../../domain/user/dtos/GoogleUserDto';
+import UserService from '../../../../domain/user/UserService';
 
 interface Auth {
     email: string;

@@ -1,25 +1,26 @@
 // src/models/PlanModel.ts
 import { Schema, model, Types, Document } from 'mongoose';
 
-export interface TaskModel {
+export interface TaskDocument {
+    _id: Types.ObjectId;
     task: string;
     isDone: boolean;
 }
-export interface PlanModel {
+export interface PlanDocument {
     userId: Types.ObjectId;
-    plan: TaskModel[][];
+    plan: TaskDocument[][];
     createdAt: Date;
     updatedAt: Date;
 }
 
-type PlanDoc = Document & PlanModel;
+type PlanDoc = Document & PlanDocument;
 
-const TaskSchema = new Schema<TaskModel>({
+const TaskSchema = new Schema({
     task: { type: String, required: true },
     isDone: { type: Boolean, default: false },
 });
 
-const PlanSchema = new Schema<PlanModel>(
+const PlanSchema = new Schema(
     {
         userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
         plan: {
@@ -76,4 +77,4 @@ PlanSchema.virtual('progressWeekly').get(function (this: PlanDoc) {
 
 PlanSchema.index({ userId: 1 });
 
-export default model<PlanModel>('Plan', PlanSchema);
+export default model<PlanDocument>('Plan', PlanSchema);
