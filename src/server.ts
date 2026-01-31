@@ -4,19 +4,29 @@ const Fastify = require('fastify');
 import jwt from '@fastify/jwt';
 import fastifyOauth2 from '@fastify/oauth2';
 import mongoose from 'mongoose';
-import authRoutes from './routes/authRoutes';
-import oauthRoutes from './routes/oauthRoutes';
-import errorHandler from './middlewares/errorHandler';
-import sessionRoutes from './routes/sessionRoutes';
-import goalRoutes from './routes/goalRoutes';
-import balanceRoutes from './routes/balanceRoutes';
-import achievementRoutes from './routes/achievementRoutes';
+import userRoutes from './infrastructure/controllers/fastify/user/userRoutes';
+import errorHandler from './infrastructure/controllers/fastify/errorHandler';
+import {MongoUserRepository} from './infrastructure/db/mongoDB/user/MongoUserRepository';
+import UserService from './domain/user/UserService';
+import UserControllers from './infrastructure/controllers/fastify/user/UserController';
+import sessionRoutes from './infrastructure/controllers/fastify/session/sessionRoutes';
+import { MongoTokenRepository } from './infrastructure/db/mongoDB/token/MongoTokenRepository';
+import { TokenService } from './domain/token/TokenService';
+import SessionController from './infrastructure/controllers/fastify/session/SessionController';
+import achievementRoutes from './infrastructure/controllers/fastify/achievement/achievementRoutes';
+import { MongoAchievementRepository } from './infrastructure/db/mongoDB/achievement/MongoAchievementRepository';
+import AchievementService from './domain/achievement/AchievementService';
+import AchievementController from './infrastructure/controllers/fastify/achievement/AchievementController';
+import { MongoPlanRepository } from './infrastructure/db/mongoDB/plan/MongoPlanRepository';
+import PlanService from './domain/plan/PlanService';
+import { PlanController } from './infrastructure/controllers/fastify/plan/PlanController';
+import { planRoutes } from './infrastructure/controllers/fastify/plan/planRoutes';
 
 const PORT = Number(process.env.PORT) || 5000;
 
 const fastify = Fastify({
-    // logger: true,
-    logger: { level: 'trace' },
+    logger: true,
+    // logger: { level: 'trace' },
 });
 
 fastify.register(jwt, {
@@ -43,19 +53,33 @@ fastify.register(fastifyOauth2, {
         },
         // auth: fastifyOauth2.GOOGLE_CONFIGURATION,
     },
-    startRedirectPath: '/api/oauth/google/login',
-    callbackUri: 'http://localhost:5000/api/oauth/google/callback',
+    startRedirectPath: '/api/user/google/login',
+    callbackUri: 'http://localhost:5000/api/user/google/callback',
     discovery: {
         issuer: 'https://accounts.google.com',
     },
 });
 
-fastify.register(authRoutes, { prefix: '/api/auth' });
-fastify.register(oauthRoutes, { prefix: '/api/oauth' });
-fastify.register(sessionRoutes, { prefix: '/api/session' });
-fastify.register(goalRoutes, { prefix: '/api/goal' });
-fastify.register(balanceRoutes, { prefix: '/api/balance' });
-fastify.register(achievementRoutes, { prefix: '/api/achievement' });
+const userRepo = new MongoUserRepository()
+export const userService = new UserService(userRepo)
+const userController = new UserControllers(userService)
+fastify.register(userRoutes, { prefix: '/api/user', controller: userController });
+
+const tokenRepo = new MongoTokenRepository()
+export const tokenService = new TokenService(tokenRepo)
+export const sessionController = new SessionController(tokenService)
+fastify.register(sessionRoutes, { prefix: '/api/session', controller: sessionController});
+
+const achievementRepo = new MongoAchievementRepository()
+export const achievementService = new AchievementService(achievementRepo)
+const achievementController = new AchievementController(achievementService)
+fastify.register(achievementRoutes, { prefix: '/api/achievement', controller: achievementController });
+
+const planRepo = new MongoPlanRepository()
+export const planService = new PlanService(planRepo)
+const planController = new PlanController(planService)
+fastify.register(planRoutes, { prefix: '/api/plan', controller: planController});
+
 fastify.setErrorHandler(errorHandler);
 
 const start = async () => {
