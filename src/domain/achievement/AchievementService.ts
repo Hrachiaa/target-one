@@ -26,7 +26,7 @@ export default class AchievementService {
     async unlockUchievment(userId: string, achievementId: string) {
         const achievements = await this.getAchievements(userId);
         const achiev = achievements.achievements.find(
-            (a: any) => a._id.toString() === achievementId
+            (a: any) => a.id === achievementId
         );
         if (!achiev) {
             throw ApiError.badRequest('Achievement not found');
@@ -38,11 +38,11 @@ export default class AchievementService {
         }
 
         const updated = await this.achievementRepo.unlockAchievement(userId, achievementId)
-        await userService.decreaseBalance(userId, achiev.price)
         if (!updated) {
             throw ApiError.badRequest('Achievement is already mark as unlocked');
         }
-
+        
+        await userService.decreaseBalance(userId, achiev.price)
         return updated;
     }
 

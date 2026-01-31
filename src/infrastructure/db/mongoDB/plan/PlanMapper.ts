@@ -18,7 +18,7 @@ interface DBMapper<T> {
 
 class PlanMapper implements DBMapper<undefined> {
     toEntity(plan: PlanDocument): PlanEntity{
-        return new PlanEntity(String(plan.userId), plan.plan.map(mapArrayofTask) )
+        return new PlanEntity(String(plan._id), plan.userId, plan.plan.map(mapArrayofTask) )
     }
     toDB(plan: PlanEntity): undefined{
         return

@@ -7,7 +7,8 @@ export interface TaskDocument {
     isDone: boolean;
 }
 export interface PlanDocument {
-    userId: Types.ObjectId;
+    _id: Types.ObjectId
+    userId: string;
     plan: TaskDocument[][];
     createdAt: Date;
     updatedAt: Date;
@@ -22,7 +23,7 @@ const TaskSchema = new Schema({
 
 const PlanSchema = new Schema(
     {
-        userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+        userId: { type: String, required: true, ref: 'User' },
         plan: {
             type: [[TaskSchema]],
             required: true,

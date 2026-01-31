@@ -18,6 +18,7 @@ export interface TaskEntity {
 
 export class PlanEntity {
     constructor(    
+        readonly id: string,
         readonly userId: string,
         readonly plan: TaskEntity[][],
     ){}
