@@ -21,6 +21,7 @@ import { MongoPlanRepository } from './infrastructure/db/mongoDB/plan/MongoPlanR
 import PlanService from './domain/plan/PlanService';
 import { PlanController } from './infrastructure/controllers/fastify/plan/PlanController';
 import { planRoutes } from './infrastructure/controllers/fastify/plan/planRoutes';
+import { PostrgresUserRepository } from './infrastructure/db/postgreSQL/user/PostgresUserRepository';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -60,7 +61,7 @@ fastify.register(fastifyOauth2, {
     },
 });
 
-const userRepo = new MongoUserRepository()
+const userRepo = new PostrgresUserRepository()
 export const userService = new UserService(userRepo)
 const userController = new UserControllers(userService)
 fastify.register(userRoutes, { prefix: '/api/user', controller: userController });
