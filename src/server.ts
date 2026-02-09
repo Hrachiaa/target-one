@@ -25,6 +25,7 @@ import { PostrgresUserRepository } from './infrastructure/db/postgreSQL/user/Pos
 import { MongoCodeRepository } from './infrastructure/db/mongoDB/confirmationCode/MongoCodeRepository';
 import { CodeService } from './domain/confirmationCode/CodeService';
 import { PostgresCodeRepository } from './infrastructure/db/postgreSQL/confirmationCode/PostgresCodeRepository';
+import { PostgresTokenRepository } from './infrastructure/db/postgreSQL/token/PostgresTokenRepository';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -72,7 +73,7 @@ fastify.register(userRoutes, { prefix: '/api/user', controller: userController }
 const codeRepo = new PostgresCodeRepository()
 export const codeService = new CodeService(codeRepo)
 
-const tokenRepo = new MongoTokenRepository()
+const tokenRepo = new PostgresTokenRepository()
 export const tokenService = new TokenService(tokenRepo)
 export const sessionController = new SessionController(tokenService)
 fastify.register(sessionRoutes, { prefix: '/api/session', controller: sessionController});
