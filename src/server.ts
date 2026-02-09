@@ -22,6 +22,9 @@ import PlanService from './domain/plan/PlanService';
 import { PlanController } from './infrastructure/controllers/fastify/plan/PlanController';
 import { planRoutes } from './infrastructure/controllers/fastify/plan/planRoutes';
 import { PostrgresUserRepository } from './infrastructure/db/postgreSQL/user/PostgresUserRepository';
+import { MongoCodeRepository } from './infrastructure/db/mongoDB/confirmationCode/MongoCodeRepository';
+import { CodeService } from './domain/confirmationCode/CodeService';
+import { PostgresCodeRepository } from './infrastructure/db/postgreSQL/confirmationCode/PostgresCodeRepository';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -65,6 +68,9 @@ const userRepo = new PostrgresUserRepository()
 export const userService = new UserService(userRepo)
 const userController = new UserControllers(userService)
 fastify.register(userRoutes, { prefix: '/api/user', controller: userController });
+
+const codeRepo = new PostgresCodeRepository()
+export const codeService = new CodeService(codeRepo)
 
 const tokenRepo = new MongoTokenRepository()
 export const tokenService = new TokenService(tokenRepo)

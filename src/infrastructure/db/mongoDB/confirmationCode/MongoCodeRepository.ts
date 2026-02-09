@@ -3,7 +3,7 @@ import { CodeRepositoryInterface } from "../../../../domain/confirmationCode/Cod
 import { mapper } from "./CodeMapper";
 import ConfirmationCodeModel, { CodeDocument } from "./CodeModel";
 
-export class ConfirmationCodeRepository implements CodeRepositoryInterface {
+export class MongoCodeRepository implements CodeRepositoryInterface {
     async createConfirmationCode (userId: string, code: string){
         const doc: CodeDocument = await ConfirmationCodeModel.create({userId, code})
         const codeEntity = mapper.toEntity(doc)

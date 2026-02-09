@@ -4,10 +4,9 @@ import MailService from '../utils/services/MailService';
 import {randomCode} from './utils/randomCode';
 import { UserRepositoryInterface } from './UserRepository';
 import { GoogleUserDto } from './dtos/GoogleUserDto';
-import { codeService } from '../confirmationCode/CodeService';
 import { UserEntity } from './models/UserEntity';
 import { CodeEntity } from '../confirmationCode/models/CodeEntity';
-import { achievementService, planService, tokenService } from '../../server';
+import { achievementService, codeService, planService, tokenService } from '../../server';
 import { TokensDto } from '../token/dtos/TokensDto';
 import { BalanceDto } from './dtos/UserDto';
 
