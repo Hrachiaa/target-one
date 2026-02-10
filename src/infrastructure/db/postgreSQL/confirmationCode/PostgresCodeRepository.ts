@@ -4,24 +4,24 @@ import { prisma } from "../prisma";
 import { mapper } from "./CodeMapper";
 
 export interface CodeDocument {
-        id: number;
-        userId: number;
+        id: string;
+        userId: string;
         code: string;
         createdAt: NativeDate;
 }
 
 export class PostgresCodeRepository implements CodeRepositoryInterface {
     async createConfirmationCode (userId: string, code: string){
-        const doc: CodeDocument = await prisma.code.create({data: {userId: Number(userId), code}})
+        const doc: CodeDocument = await prisma.code.create({data: {userId, code}})
         const codeEntity = mapper.toEntity(doc)
         return codeEntity
     }
 
     async findConfirmatioanCode(userId: string){
-        const doc: CodeDocument | null = await prisma.code.findUnique({where: {userId: Number(userId)}})
+        const doc: CodeDocument | null = await prisma.code.findUnique({where: {userId}})
         if(!doc) return null
         if(Date.now() - doc.createdAt.getTime() > 15 * 60 * 1000){
-            await prisma.code.delete({where: {userId: Number(userId)}})
+            await prisma.code.delete({where: {userId}})
             return null
         }
         const codeEntity = mapper.toEntity(doc)
@@ -29,14 +29,14 @@ export class PostgresCodeRepository implements CodeRepositoryInterface {
     }
 
     async updateConfirmationCode(codeId: string, code: string){
-        const doc: CodeDocument | null = await prisma.code.update({where: {id: Number(codeId)}, data: {code, createdAt: new Date()}})
+        const doc: CodeDocument | null = await prisma.code.update({where: {id: codeId}, data: {code, createdAt: new Date()}})
         if(!doc) throw ApiError.badRequest('Some error')
         const codeEntity = mapper.toEntity(doc)
         return codeEntity
     }
 
     async deleteCode(codeId: string){
-        const doc: CodeDocument | null = await prisma.code.delete({where: {id: Number(codeId)}})
+        const doc: CodeDocument | null = await prisma.code.delete({where: {id: codeId}})
         return
     }
 

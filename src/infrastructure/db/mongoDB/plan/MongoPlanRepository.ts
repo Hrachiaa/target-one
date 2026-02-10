@@ -14,7 +14,7 @@ export class MongoPlanRepository implements PlanRepositoryInterface{
     async getAllPlans (userId: string): Promise <PlanEntity[]>{
         const doc: PlanDocument[] = await PlanModel.find({userId})
         if(!doc.length) return []
-        const plansEntity = doc.map(mapper.toEntity)
+        const plansEntity = doc.map((plan) => mapper.toEntity(plan))
         return plansEntity
     }
 
@@ -38,7 +38,14 @@ export class MongoPlanRepository implements PlanRepositoryInterface{
             }
         )
         if(!doc) return null
-        return mapper.toEntity(doc)
+
+        const task = doc.plan
+            .flat()
+            .find(t => t._id.toString() === taskId);
+
+        if (!task) return null;
+
+        return mapper.toTaskEntity(task)
     }
 
     async uncompleteTask (userId: string, taskId: string) {
@@ -61,7 +68,14 @@ export class MongoPlanRepository implements PlanRepositoryInterface{
             }
         )
         if(!doc) return null
-        return mapper.toEntity(doc)
+        
+        const task = doc.plan
+            .flat()
+            .find(t => t._id.toString() === taskId);
+
+        if (!task) return null;
+
+        return mapper.toTaskEntity(task)
     }
 
     async deletePlan(planId: string): Promise<void>{

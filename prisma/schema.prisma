@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id Int @default(autoincrement()) @id
+  id String @default(cuid()) @id
   email String @unique
   emailVerified Boolean @default(false)
   googleId String?
@@ -23,11 +23,12 @@ model User {
   avatar String @default("https://cdn/first-login.png")
   code Code?
   token Token?
+  plan Plan[]
 }
 
 model Code {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
+  id        String      @id @default(cuid())
+  userId    String      @unique
   code      String
   createdAt DateTime @default(now())
 
@@ -35,10 +36,39 @@ model Code {
 }
 
 model Token {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
+  id        String      @id @default(cuid())
+  userId    String      @unique
   refreshToken      String
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id     String @id @default(cuid())
+  userId String 
+  user   User   @relation(fields: [userId], references: [id])
+
+  weeks  Week[]
+}
+
+model Week {
+  id     String @id @default(cuid())
+  index  Int    
+
+  plan   Plan   @relation(fields: [planId], references: [id])
+  planId String
+
+  tasks  Task[]
+}
+
+model Task {
+  id     String  @id @default(cuid())
+  task   String
+  isDone Boolean @default(false)
+
+  index  Int
+
+  week   Week    @relation(fields: [weekId], references: [id])
+  weekId String
 }

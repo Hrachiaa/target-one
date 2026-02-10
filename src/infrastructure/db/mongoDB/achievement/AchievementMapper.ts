@@ -17,10 +17,10 @@ const mapAchievement = (
     })
 
 class UserMapper implements DBMapper<undefined> {
-    toEntity(achiev: AchievementsDocument): AchievementsEntity{
-        return new AchievementsEntity(achiev._id.toString(), achiev.userId, achiev.achievements.map(mapAchievement))
+    toEntity(achieve: AchievementsDocument): AchievementsEntity{
+        return new AchievementsEntity(achieve._id.toString(), achieve.userId, achieve.achievements.map(mapAchievement))
     }
-    toDB(user: AchievementsEntity): undefined{
+    toDB(achieve: AchievementsEntity): undefined{
         return
     }
 }

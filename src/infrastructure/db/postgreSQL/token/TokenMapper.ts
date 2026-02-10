@@ -8,7 +8,7 @@ interface DBMapper<T> {
 
 class TokenMapper implements DBMapper<undefined> {
     toEntity(token: TokenDocument): TokenEntity{
-        return new TokenEntity(String(token.id), token.refreshToken)
+        return new TokenEntity(token.id, token.refreshToken)
     }
     toDB(token: TokenEntity): undefined{
         return

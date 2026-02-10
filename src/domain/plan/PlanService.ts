@@ -6,7 +6,7 @@ import ApiError from '../utils/errors/ApiError';
 import { questionsSchema, planSchema } from './schemas/planSchemas';
 import { userService } from '../../server';
 import { PlanRepositoryInterface } from './PlanRepository';
-import { PlanEntity, QuestionsFromAI, TaskFromAI } from './models/PlanEntity';
+import { PlanEntity, QuestionsFromAI, TaskEntity, TaskFromAI } from './models/PlanEntity';
 
 export default class PlanService {
     constructor(readonly planRepo: PlanRepositoryInterface){}
@@ -48,8 +48,8 @@ export default class PlanService {
         return plans;
     }
 
-    async completePlanTask(userId: string, taskId: string): Promise<PlanEntity> {
-        const updated: PlanEntity | null = await this.planRepo.completeTask(userId, taskId)
+    async completePlanTask(userId: string, taskId: string): Promise<TaskEntity> {
+        const updated: TaskEntity | null = await this.planRepo.completeTask(userId, taskId)
         if (!updated) {
             throw ApiError.badRequest('Task is already done');
         }
@@ -57,8 +57,8 @@ export default class PlanService {
         return updated;
     }
 
-    async uncompletePlanTask(userId: string, taskId: string): Promise<PlanEntity> {
-        const updated: PlanEntity | null = await this.planRepo.uncompleteTask(userId, taskId)
+    async uncompletePlanTask(userId: string, taskId: string): Promise<TaskEntity> {
+        const updated: TaskEntity | null = await this.planRepo.uncompleteTask(userId, taskId)
         if (!updated) {
             throw ApiError.badRequest('Task is already mark as not done');
         }

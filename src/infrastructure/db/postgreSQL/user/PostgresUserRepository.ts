@@ -5,7 +5,7 @@ import { prisma } from "../prisma";
 import { mapper } from "./UserMapper";
 
 export interface UserDocument {
-    id: number;
+    id: string;
     email: string;
     emailVerified: boolean;
     googleId: string | null;
@@ -35,7 +35,7 @@ export class PostrgresUserRepository implements UserRepositoryInterface {
     }
 
     async findById(userId: string){
-        const user: UserDocument | null = await prisma.user.findUnique({where: {id: Number(userId)}})
+        const user: UserDocument | null = await prisma.user.findUnique({where: {id: userId}})
         if (!user) throw ApiError.badRequest('User not found')
         return mapper.toEntity(user)
     }
@@ -52,28 +52,28 @@ export class PostrgresUserRepository implements UserRepositoryInterface {
 
     async verifyUserWithEmail(userId: string, googleId: string){
         const user: UserDocument | null = await prisma.user.update({
-            where: {id: Number(userId)}, data: {googleId, emailVerified: true}})
+            where: {id: userId}, data: {googleId, emailVerified: true}})
         if (!user) throw ApiError.badRequest('User not found')
         return mapper.toEntity(user)
     }
 
     async setAvatar (userId: string, avatar: string){
         const user: UserDocument | null = await prisma.user.update({
-            where: {id: Number(userId)}, data: {avatar}})
+            where: {id: userId}, data: {avatar}})
         if (!user) throw ApiError.badRequest('User not found')
         return mapper.toEntity(user)
     }
 
     async changePassword(userId: string, password: string){
         const user: UserDocument | null = await prisma.user.update({
-            where: {id: Number(userId)}, data: {password}})
+            where: {id: userId}, data: {password}})
         if (!user) throw ApiError.badRequest('User not found')
         return mapper.toEntity(user)
     }
 
     async verifyEmail(userId: string){
         const user: UserDocument | null = await prisma.user.update({
-            where: {id: Number(userId)}, data: {emailVerified: true}})
+            where: {id: userId}, data: {emailVerified: true}})
         if (!user) throw ApiError.badRequest('User not found')
         return mapper.toEntity(user)
     }
@@ -81,7 +81,7 @@ export class PostrgresUserRepository implements UserRepositoryInterface {
     async changeBalance(userId: string, amount: number) {
         const user: UserDocument | null = await prisma.user.update({
             where: {
-                id: Number(userId),
+                id: userId,
             },
             data: {
                 balance: {
@@ -94,7 +94,7 @@ export class PostrgresUserRepository implements UserRepositoryInterface {
     }
 
     async deleteUser(userId: string){
-        const user: UserDocument | null = await prisma.user.delete({where: {id: Number(userId)}})
+        const user: UserDocument | null = await prisma.user.delete({where: {id: userId}})
         if(!user) return null
         return mapper.toEntity(user)
     }
