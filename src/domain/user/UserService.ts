@@ -196,10 +196,10 @@ export default class UserService {
     async deleteUser(userId: string): Promise<Message> {
         const user: UserEntity = await this.userRepo.findById(userId);
 
-        await this.userRepo.deleteUser(user.id)
         await tokenService.removeTokenById(userId);
         await achievementService.removeAchievements(userId);
         await planService.removeGoals(userId);
+        await this.userRepo.deleteUser(user.id)
         return { message: 'User was deleted' };
     }
 

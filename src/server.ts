@@ -27,6 +27,7 @@ import { CodeService } from './domain/confirmationCode/CodeService';
 import { PostgresCodeRepository } from './infrastructure/db/postgreSQL/confirmationCode/PostgresCodeRepository';
 import { PostgresTokenRepository } from './infrastructure/db/postgreSQL/token/PostgresTokenRepository';
 import { PostgresPlanRepository } from './infrastructure/db/postgreSQL/plan/PostgresPlanRepository';
+import { PostgresAchievementRepository } from './infrastructure/db/postgreSQL/achievement/PostgresAchievementRepository';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -82,7 +83,8 @@ export const tokenService = new TokenService(tokenRepo)
 export const sessionController = new SessionController(tokenService)
 fastify.register(sessionRoutes, { prefix: '/api/session', controller: sessionController});
 
-const achievementRepo = new MongoAchievementRepository()
+// const achievementRepo = new MongoAchievementRepository()
+const achievementRepo = new PostgresAchievementRepository()
 export const achievementService = new AchievementService(achievementRepo)
 const achievementController = new AchievementController(achievementService)
 fastify.register(achievementRoutes, { prefix: '/api/achievement', controller: achievementController });

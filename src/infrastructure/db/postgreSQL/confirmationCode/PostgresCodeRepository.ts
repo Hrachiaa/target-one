@@ -36,7 +36,7 @@ export class PostgresCodeRepository implements CodeRepositoryInterface {
     }
 
     async deleteCode(codeId: string){
-        const doc: CodeDocument | null = await prisma.code.delete({where: {id: codeId}})
+        await prisma.code.deleteMany({where: {id: codeId}})
         return
     }
 

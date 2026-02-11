@@ -1,8 +1,8 @@
 import { Schema, Types, model } from 'mongoose';
 
-export interface AchievementDocument {
+export interface AchievementItemDocument {
     _id: Types.ObjectId;
-    achievement_name: string;
+    achievementName: string;
     icon: string;
     price: number;
     isUnlocked: boolean
@@ -11,12 +11,12 @@ export interface AchievementDocument {
 export interface AchievementsDocument {
     _id: Types.ObjectId;
     userId: string;
-    achievements: AchievementDocument[];
+    achievements: AchievementItemDocument[];
     __v: number;
 } 
 
 const AchievementSchema = new Schema({
-    achievement_name: { type: String, required: true },
+    achievementName: { type: String, required: true },
     icon: { type: String, required: true },
     price: { type: Number, required: true },
     isUnlocked: { type: Boolean, default: false },

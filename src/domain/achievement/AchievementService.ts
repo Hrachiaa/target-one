@@ -57,7 +57,7 @@ export default class AchievementService {
             throw ApiError.badRequest('Achievement not unlocked');
         }
 
-        const achievementLink = achievement.achievements[0].icon;
+        const achievementLink = achievement.icon;
 
         return await userService.setAvatar(userId, achievementLink)
     }

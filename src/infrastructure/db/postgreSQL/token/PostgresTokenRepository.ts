@@ -33,7 +33,7 @@ export class PostgresTokenRepository implements TokenRepositoryInterface {
     }
 
     async deleteToken (userId: string){
-        await prisma.token.delete({where: {userId: userId}})
+        await prisma.token.deleteMany({where: {userId}})
         return
     }
 }
