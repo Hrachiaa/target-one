@@ -21,6 +21,13 @@ import { MongoPlanRepository } from './infrastructure/db/mongoDB/plan/MongoPlanR
 import PlanService from './domain/plan/PlanService';
 import { PlanController } from './infrastructure/controllers/fastify/plan/PlanController';
 import { planRoutes } from './infrastructure/controllers/fastify/plan/planRoutes';
+import { PostrgresUserRepository } from './infrastructure/db/postgreSQL/user/PostgresUserRepository';
+import { MongoCodeRepository } from './infrastructure/db/mongoDB/confirmationCode/MongoCodeRepository';
+import { CodeService } from './domain/confirmationCode/CodeService';
+import { PostgresCodeRepository } from './infrastructure/db/postgreSQL/confirmationCode/PostgresCodeRepository';
+import { PostgresTokenRepository } from './infrastructure/db/postgreSQL/token/PostgresTokenRepository';
+import { PostgresPlanRepository } from './infrastructure/db/postgreSQL/plan/PostgresPlanRepository';
+import { PostgresAchievementRepository } from './infrastructure/db/postgreSQL/achievement/PostgresAchievementRepository';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -60,22 +67,30 @@ fastify.register(fastifyOauth2, {
     },
 });
 
-const userRepo = new MongoUserRepository()
+// const userRepo = new MongoUserRepository()
+const userRepo = new PostrgresUserRepository()
 export const userService = new UserService(userRepo)
 const userController = new UserControllers(userService)
 fastify.register(userRoutes, { prefix: '/api/user', controller: userController });
 
-const tokenRepo = new MongoTokenRepository()
+// const codeRepo = new MongoCodeRepository()
+const codeRepo = new PostgresCodeRepository()
+export const codeService = new CodeService(codeRepo)
+
+// const tokenRepo = new MongoTokenRepository()
+const tokenRepo = new PostgresTokenRepository()
 export const tokenService = new TokenService(tokenRepo)
 export const sessionController = new SessionController(tokenService)
 fastify.register(sessionRoutes, { prefix: '/api/session', controller: sessionController});
 
-const achievementRepo = new MongoAchievementRepository()
+// const achievementRepo = new MongoAchievementRepository()
+const achievementRepo = new PostgresAchievementRepository()
 export const achievementService = new AchievementService(achievementRepo)
 const achievementController = new AchievementController(achievementService)
 fastify.register(achievementRoutes, { prefix: '/api/achievement', controller: achievementController });
 
-const planRepo = new MongoPlanRepository()
+// const planRepo = new MongoPlanRepository()
+const planRepo = new PostgresPlanRepository()
 export const planService = new PlanService(planRepo)
 const planController = new PlanController(planService)
 fastify.register(planRoutes, { prefix: '/api/plan', controller: planController});

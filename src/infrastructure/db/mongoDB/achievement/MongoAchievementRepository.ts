@@ -33,7 +33,14 @@ export class MongoAchievementRepository implements AchievementRepositoryInterfac
             }
         );
         if(!achieves) return null 
-        return mapper.toEntity(achieves)
+
+        const item = achieves.achievements
+            .flat()
+            .find(t => t._id.toString() === achievementId);
+
+        if (!item) return null;
+
+        return mapper.toItemEntity(item)
     }
 
     async unlockAchievement(userId: string, achievementId: string){
@@ -58,7 +65,15 @@ export class MongoAchievementRepository implements AchievementRepositoryInterfac
             }
         )
         if(!achieves) return null 
-        return mapper.toEntity(achieves)
+
+        const item = achieves.achievements
+            .flat()
+            .find(t => t._id.toString() === achievementId);
+
+        if (!item) return null;
+
+        return mapper.toItemEntity(item)
+
     }
 
     async deleteAll (userId: string){

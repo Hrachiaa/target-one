@@ -1,9 +1,9 @@
-import { AchievementsEntity } from "./models/AchievementEntity";
+import { AchievementsEntity, AchievementItem } from "./models/AchievementEntity";
 
 export interface AchievementRepositoryInterface {
     createAchievements(userId: string): Promise <AchievementsEntity>;
     findByUserId(userId: string): Promise <AchievementsEntity | null>;
-    findIfUnlocked(userId: string, achievementId: string): Promise <AchievementsEntity | null>;
-    unlockAchievement(userId: string, achievementId: string): Promise <AchievementsEntity | null>;
+    findIfUnlocked(userId: string, achievementId: string): Promise <AchievementItem | null>;
+    unlockAchievement(userId: string, achievementId: string): Promise <AchievementItem | null>;
     deleteAll(userId: string): Promise <void>;
 }

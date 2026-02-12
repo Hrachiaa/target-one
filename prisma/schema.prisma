@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id String @default(cuid()) @id
+  email String @unique
+  emailVerified Boolean @default(false)
+  googleId String?
+  password String?
+  balance Float @default(0)
+  avatar String @default("https://cdn/first-login.png")
+  code Code?
+  token Token?
+  achievements Achievements?
+  plan Plan[]
+}
+
+model Code {
+  id        String      @id @default(cuid())
+  userId    String      @unique
+  code      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Token {
+  id        String      @id @default(cuid())
+  userId    String      @unique
+  refreshToken      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id     String @id @default(cuid())
+  userId String 
+  user   User   @relation(fields: [userId], references: [id])
+
+  weeks  Week[]
+}
+
+model Week {
+  id     String @id @default(cuid())
+  index  Int    
+
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId String
+
+  tasks  Task[]
+}
+
+model Task {
+  id     String  @id @default(cuid())
+  task   String
+  isDone Boolean @default(false)
+
+  index  Int
+
+  week   Week    @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  weekId String
+}
+
+model Achievements {
+  id String @id @default(cuid())
+
+  user User @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  achievements AchievementItem[]
+}
+
+model AchievementItem {
+  id String @id @default(cuid()) 
+  achievementName String
+  icon String
+  price Int
+  isUnlocked Boolean @default(false)
+
+  achievements Achievements @relation(fields: [achievementsId], references: [id], onDelete: Cascade)
+  achievementsId String
+
+}

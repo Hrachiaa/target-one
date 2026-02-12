@@ -1,9 +1,8 @@
-import { ConfirmationCodeRepository } from "../../infrastructure/db/mongoDB/confirmationCode/MongoCodeRepository";
-import { MongoUserRepository } from "../../infrastructure/db/mongoDB/user/MongoUserRepository";
+import { MongoCodeRepository } from "../../infrastructure/db/mongoDB/confirmationCode/MongoCodeRepository";
 import { CodeRepositoryInterface } from "./CodeRepository";
 import { CodeEntity } from "./models/CodeEntity";
 
-class CodeService {
+export class CodeService {
     constructor(readonly codeRepo: CodeRepositoryInterface){}
     async findCodeByUserId (userId: string): Promise <CodeEntity | null>{
         return await this.codeRepo.findConfirmatioanCode(userId)
@@ -21,6 +20,3 @@ class CodeService {
         return await this.codeRepo.deleteCode(codeId)
     }
 }
-
-const codeRepo = new ConfirmationCodeRepository()
-export const codeService = new CodeService(codeRepo)

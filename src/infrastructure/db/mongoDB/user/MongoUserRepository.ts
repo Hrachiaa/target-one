@@ -11,8 +11,8 @@ export class MongoUserRepository implements UserRepositoryInterface {
     }
 
     async findUserByGoogleId (googleId: string){
-        const user: UserDocument | null = await UserModel.findOne({googleId})
-        if (!user) return null
+    const user: UserDocument | null = await UserModel.findOne({googleId})
+    if (!user) return null
         return mapper.toEntity(user)    
     }
 

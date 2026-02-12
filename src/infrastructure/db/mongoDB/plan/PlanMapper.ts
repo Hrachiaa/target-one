@@ -12,8 +12,9 @@ const mapArrayofTask = (taskArray: TaskDocument[]): TaskEntity[] => {
 }
 
 interface DBMapper<T> {
-    toEntity(tokenDocument: PlanDocument): PlanEntity;
-    toDB(tokenEntity: PlanEntity): T
+    toEntity(planDocument: PlanDocument): PlanEntity;
+    toDB(planEntity: PlanEntity): T
+    toTaskEntity(task: TaskDocument): TaskEntity
 }
 
 class PlanMapper implements DBMapper<undefined> {
@@ -22,6 +23,10 @@ class PlanMapper implements DBMapper<undefined> {
     }
     toDB(plan: PlanEntity): undefined{
         return
+    }
+    toTaskEntity(task: TaskDocument): TaskEntity {
+        const taskEntity = {id: String(task._id), task: task.task, isDone: task.isDone}
+        return taskEntity
     }
 }
 
