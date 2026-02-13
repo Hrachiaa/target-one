@@ -14,7 +14,7 @@ export default class PlanService {
     temperature = 1;
     store = false;
 
-    async createQuestions(userId: string, goal: string): Promise<QuestionsFromAI | null> {
+    async createQuestions(userId: string, goal: string): Promise<QuestionsFromAI> {
         const questions = await client.responses.parse({
             model: this.model,
             temperature: this.temperature,
@@ -25,6 +25,9 @@ export default class PlanService {
             store: this.store,
         });
         const questionsres: QuestionsFromAI | null = questions.output_parsed
+        if(!questionsres) {
+            throw ApiError.serverError('Questions did not created')
+        }
         return questionsres;
     }
 
