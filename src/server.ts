@@ -28,6 +28,8 @@ import { PostgresCodeRepository } from './infrastructure/db/postgreSQL/confirmat
 import { PostgresTokenRepository } from './infrastructure/db/postgreSQL/token/PostgresTokenRepository';
 import { PostgresPlanRepository } from './infrastructure/db/postgreSQL/plan/PostgresPlanRepository';
 import { PostgresAchievementRepository } from './infrastructure/db/postgreSQL/achievement/PostgresAchievementRepository';
+import fastifySwaggerUi from '@fastify/swagger-ui';
+import fastifySwagger from '@fastify/swagger';
 
 const PORT = Number(process.env.PORT) || 5000;
 
@@ -35,6 +37,38 @@ const fastify = Fastify({
     logger: true,
     // logger: { level: 'trace' },
 });
+
+const swagger = async function (){
+    await fastify.register(fastifySwagger, {
+      openapi: {
+        components: {
+            securitySchemes: {
+                bearerAuth: {  
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                }
+            }
+        },
+        info: {
+          title: 'My API',
+          version: '1.0.0'
+        }
+      }
+    })
+    
+    await fastify.register(fastifySwaggerUi, {
+        routePrefix: '/docs',
+        uiConfig: {
+            docExpansion: 'full',
+            deepLinking: false
+        },
+    })
+};
+
+(async () => {
+    await swagger()
+})()
 
 fastify.register(jwt, {
     secret: process.env.JWT_ACCESS_SECRET,

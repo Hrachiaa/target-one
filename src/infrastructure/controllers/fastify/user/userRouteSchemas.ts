@@ -1,5 +1,39 @@
+import { any, nullable } from "zod";
+
+const tokensDto = {
+    type: 'object', 
+    properties: {
+        user: {
+            type: 'object',
+            properties: {
+                id: {type: 'string'},
+                email: {type: 'string'},
+                googleId: {type: 'string', nullable: true}
+            }
+        },
+        accessToken: {type: 'string'},
+        refreshToken: {type: 'string'}
+    }
+}
+
+const messageResponse = {
+    type: 'object',
+    properties: {
+        message: {type: 'string'}
+    }
+}
+
+const anyError = {
+    type: 'object', 
+    properties: {
+        statusCode: {type: 'number'},
+        error: {type: 'string'},
+        message: {type: 'string'},
+    }
+}
+
 export default {
-    authSchema: {
+    auth: {
         body: {
             type: 'object',
             required: ['email', 'password'],
@@ -13,8 +47,12 @@ export default {
             },
             additionalProperties: false,
         },
+        response: {
+            200: tokensDto,
+            default: anyError
+        },
     },
-    forgotPassSchema: {
+    forgotPass: {
         body: {
             type: 'object',
             required: ['email'],
@@ -23,8 +61,12 @@ export default {
             },
             additionalProperties: false,
         },
+        response: {
+            200: messageResponse,
+            default: anyError
+        }
     },
-    checkCode: {
+    checkResetCode: {
         body: {
             type: 'object',
             required: ['email', 'code'],
@@ -34,6 +76,10 @@ export default {
             },
             additionalProperties: false,
         },
+        response: {
+            200: messageResponse,
+            default: anyError
+        }
     },
     reset: {
         body: {
@@ -46,15 +92,65 @@ export default {
             },
             additionalProperties: false,
         },
+        response: {
+            200: messageResponse,
+            default: anyError
+        }
     },
-    getRefreshSchema: {
+    changePassword: {
+        security: [{ bearerAuth: [] }],
         body: {
             type: 'object',
-            required: ['refreshToken'],
+            required: ['oldPassword', 'newPassword'],
             properties: {
-                refreshToken: { type: 'string' },
-            },
-            additionalProperties: false,
+                oldPassword: {type: 'string', minLength: 8, maxLength: 64},
+                newPassword: {type: 'string', minLength: 8, maxLength: 64}
+            }
         },
+        response: {
+            200: messageResponse,
+            default: anyError
+        }
     },
+    confirmEmail: {
+        security: [{ bearerAuth: [] }],
+        response: {
+            200: messageResponse,
+            default: anyError
+        }
+    }, 
+    deleteUser: {
+        security: [{ bearerAuth: [] }],
+        response: {
+            200: messageResponse,
+            default: anyError
+        }
+    }, 
+    balance: {
+        security: [{ bearerAuth: [] }],
+        response: {
+            200: {
+                type: 'object',
+                required: ['balance'],
+                properties: {
+                    balance: {type: 'number'}
+                }
+            },
+            default: anyError
+        }
+    }, 
+    checkConfirmCode: {
+        security: [{ bearerAuth: [] }],
+        body: {
+            required: ['code'],
+            type: 'object',
+            properties: {
+                code: {type: 'string', minLength: 4, maxLength: 4}
+            }
+        },
+        response: {
+            200: messageResponse,
+            default: anyError
+        }
+    }
 };

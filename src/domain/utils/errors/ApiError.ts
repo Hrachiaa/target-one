@@ -1,7 +1,7 @@
 export default class ApiError extends Error {
-  statusCode: 400 | 401 | 403 | 404 | 500;
+  statusCode: number | undefined;
 
-  constructor(statusCode: 400 | 401 | 403 | 404 | 500, message: string) {
+  constructor(statusCode: number | undefined, message: string) {
     super(message);
     this.statusCode = statusCode;
   }
