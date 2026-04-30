@@ -92,13 +92,13 @@ fastify.register(fastifyOauth2, {
             id: process.env.GOOGLE_CLIENT_ID,
             secret: process.env.GOOGLE_CLIENT_SECRET,
         },
-        auth: fastifyOauth2.GOOGLE_CONFIGURATION,
+        // auth: fastifyOauth2.GOOGLE_CONFIGURATION,
     },
     startRedirectPath: '/api/user/google/login',
     callbackUri: `http://${process.env.SERVER}/api/user/google/callback`,
-    // discovery: {
-    //     issuer: 'https://accounts.google.com',
-    // },
+    discovery: {
+        issuer: 'https://accounts.google.com',
+    },
 });
 
 // const userRepo = new MongoUserRepository()
