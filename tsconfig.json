@@ -41,8 +41,8 @@
         // "moduleDetection": "force",
         "skipLibCheck": true,
 
-        "ignoreDeprecations": "6.0",
-        "moduleResolution": "node",
+        // "ignoreDeprecations": "6.0",
+        // "moduleResolution": "node",
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "sourceMap": true,
