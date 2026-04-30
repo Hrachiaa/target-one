@@ -134,9 +134,8 @@ fastify.setErrorHandler(errorHandler);
 const start = async () => {
     try {
         await mongoose.connect(process.env.DB_URL as string);
-        await fastify.listen({ port: PORT }, () =>
-            console.log(`Server run on port ${PORT}`)
-        );
+        await fastify.listen({ port: PORT, host: '0.0.0.0' });
+        console.log(`Server run on port ${PORT}`);
     } catch (error) {
         console.log(error);
     }
